@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flujo de Procesos de Gestión - PMBOK®</title>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --line-color: #bdc3c7;
+            --active-color: #2c3e50;
+            
+            /* Colores de Fase */
+            --init-color: #f1c40f;
+            --plan-color: #3498db;
+            --exec-color: #e74c3c;
+            --ctrl-color: #9b59b6;
+            --close-color: #2ecc71;
+            
+            --node-size: 140px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            color: #333;
+        }
+
+        h1 { margin-bottom: 10px; color: #2c3e50; }
+        p.subtitle { color: #7f8c8d; max-width: 600px; text-align: center; margin-bottom: 40px; }
+
+        /* Contenedor del Diagrama */
+        .flow-container {
+            position: relative;
+            width: 900px;
+            height: 500px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; /* Para las flechas SVG */
+        }
+
+        /* Capa SVG para las conexiones */
+        .connections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Dejar pasar clicks a los nodos */
+            z-index: 1;
+        }
+
+        .connection-line {
+            fill: none;
+            stroke: var(--line-color);
+            stroke-width: 3;
+            transition: stroke 0.3s, stroke-width 0.3s;
+        }
+
+        .arrow-head {
+            fill: var(--line-color);
+            transition: fill 0.3s;
+        }
+
+        /* Nodos (Fases) */
+        .node {
+            position: absolute;
+            width: var(--node-size);
+            height: var(--node-size);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background-color: white;
+            border: 4px solid transparent; /* Se define por id */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 2;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .node h3 { margin: 0; font-size: 1rem; color: #34495e; }
+        .node span { font-size: 0.75rem; color: #7f8c8d; margin-top: 5px; }
+        .node-icon { font-size: 1.5rem; margin-bottom: 5px; }
+
+        /* Posicionamiento de Nodos */
+        #node-init { left: 50px; top: 50%; transform: translateY(-50%); border-color: var(--init-color); }
+        #node-plan { left: 300px; top: 25%; border-color: var(--plan-color); }
+        #node-exec { left: 550px; top: 50%; transform: translateY(-50%); border-color: var(--exec-color); }
+        #node-ctrl { left: 300px; top: 75%; border-color: var(--ctrl-color); } /* Abajo de Plan */
+        #node-close { right: 50px; top: 50%; transform: translateY(-50%); border-color: var(--close-color); }
+
+        /* Estilos Interactivos (Active Class) */
+        .node:hover, .node.active {
+            transform: scale(1.1) translateY(0);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            background-color: #fffdf0; /* Ligero tinte */
+            z-index: 10;
+        }
+        
+        #node-init:hover { transform: scale(1.1) translateY(-50%); }
+        #node-exec:hover { transform: scale(1.1) translateY(-50%); }
+        #node-close:hover { transform: scale(1.1) translateY(-50%); }
+
+
+        /* Caja de Información (Tooltip fijo abajo) */
+        .info-panel {
+            margin-top: 30px;
+            width: 900px;
+            min-height: 120px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-left: 6px solid #ccc;
+            transition: border-color 0.3s;
+        }
+
+        .info-title { font-weight: bold; font-size: 1.2rem; color: #2c3e50; margin-bottom: 5px; }
+        .info-desc { color: #555; line-height: 1.6; }
+        .flow-detail { margin-top: 10px; font-size: 0.9rem; color: #2980b9; font-weight: 600; }
+
+        /* Estados de Animación de Líneas */
+        .highlight-path {
+            stroke: #2c3e50 !important;
+            stroke-width: 5 !important;
+            stroke-dasharray: 10;
+            animation: dash 1s linear infinite;
+        }
+        
+        .highlight-arrow {
+            fill: #2c3e50 !important;
+        }
+
+        @keyframes dash {
+            to { stroke-dashoffset: -20; }
+        }
+
+        /* Pulsing effect for the "Return Loop" */
+        .pulse-loop {
+            stroke: #e74c3c;
+            stroke-width: 4;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Workflow de Información del Proyecto</h1>
+    <p class="subtitle">Interacción dinámica entre los 5 Grupos de Procesos. Pase el cursor sobre una fase para ver qué información genera y hacia dónde fluye.</p>
+
+    <div class="flow-container">
+        <svg class="connections" width="900" height="500">
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" class="arrow-head"/>
+                </marker>
+                <marker id="arrowhead-active" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+                </marker>
+            </defs>
+
+            <!-- 1. Init -> Plan -->
+            <path id="path-init-plan" d="M 120 250 Q 200 250 250 200 L 280 180" class="connection-line" marker-end="url(#arrowhead)"/>
+            
+            <!-- 2. Plan -> Exec -->
+            <path id="path-plan-exec" d="M 370 150 L 530 230" class="connection-line" marker-end="url(#arrowhead)"/>
+            
+            <!-- 3. Exec -> Control -->
+            <path id="path-exec-ctrl" d="M 550 280 L 390 380" class="connection-line" marker-end="url(#arrowhead)"/>
+
+            <!-- 4. Control -> Plan (LOOP) - Curva Izquierda -->
+            <path id="path-ctrl-plan" d="M 300 375 Q 180 250 300 135" class="connection-line pulse-loop" marker-end="url(#arrowhead)" style="stroke-dasharray: 5,5;"/>
+
+            <!-- 5. Control -> Close (EXIT) -->
+            <path id="path-ctrl-close" d="M 390 400 Q 600 450 780 280" class="connection-line" marker-end="url(#arrowhead)"/>
+
+        </svg>
+
+        <!-- Nodos -->
+        <div id="node-init" class="node" data-phase="init">
+            <div class="node-icon">🚀</div>
+            <h3>Iniciación</h3>
+            <span>El punto de partida</span>
+        </div>
+
+        <div id="node-plan" class="node" data-phase="plan">
+            <div class="node-icon">🗺️</div>
+            <h3>Planificación</h3>
+            <span>La hoja de ruta</span>
+        </div>
+
+        <div id="node-exec" class="node" data-phase="exec">
+            <div class="node-icon">⚙️</div>
+            <h3>Ejecución</h3>
+            <span>Hacer el trabajo</span>
+        </div>
+
+        <div id="node-ctrl" class="node" data-phase="ctrl">
+            <div class="node-icon">🔍</div>
+            <h3>Control</h3>
+            <span>Medir y Corregir</span>
+        </div>
+
+        <div id="node-close" class="node" data-phase="close">
+            <div class="node-icon">🏁</div>
+            <h3>Cierre</h3>
+            <span>Entrega formal</span>
+        </div>
+    </div>
+
+    <div class="info-panel" id="info-box">
+        <div class="info-title" id="info-title">Seleccione una fase del diagrama</div>
+        <div class="info-desc" id="info-desc">Explore cómo fluye la información. Note que "Planificar-Hacer-Controlar" forma un ciclo iterativo, no una línea recta.</div>
+        <div class="flow-detail" id="flow-detail"></div>
+    </div>
+
+    <script>
+        const nodes = document.querySelectorAll('.node');
+        const infoTitle = document.getElementById('info-title');
+        const infoDesc = document.getElementById('info-desc');
+        const flowDetail = document.getElementById('flow-detail');
+        const infoBox = document.getElementById('info-box');
+
+        // Datos de flujo
+        const phases = {
+            init: {
+                title: "Iniciación",
+                desc: "Se define el proyecto a alto nivel y se autoriza formalmente.",
+                flow: "OUTPUT ➔ Project Charter (Acta de Constitución) y Registro de Interesados.<br>DESTINO ➔ Planificación.",
+                paths: ['path-init-plan'],
+                color: '#f1c40f'
+            },
+            plan: {
+                title: "Planificación",
+                desc: "Se define el alcance total y el curso de acción (Cómo se hará).",
+                flow: "OUTPUT ➔ Plan para la Dirección del Proyecto (Líneas Base).<br>DESTINO ➔ Ejecución.",
+                paths: ['path-plan-exec'],
+                color: '#3498db'
+            },
+            exec: {
+                title: "Ejecución",
+                desc: "Se integran personas y recursos para implementar el plan. Aquí se gasta el presupuesto.",
+                flow: "OUTPUT ➔ Entregables y Datos de Desempeño (Work Performance Data).<br>DESTINO ➔ Control.",
+                paths: ['path-exec-ctrl'],
+                color: '#e74c3c'
+            },
+            ctrl: {
+                title: "Monitoreo y Control",
+                desc: "Se mide el desempeño real vs. planificado. Fase crítica de toma de decisiones.",
+                flow: "OUTPUT 1 ➔ Solicitudes de Cambio (Correcciones) ➔ Vuelve a PLANIFICACIÓN.<br>OUTPUT 2 ➔ Entregables Verificados ➔ Va a CIERRE.",
+                paths: ['path-ctrl-plan', 'path-ctrl-close'],
+                color: '#9b59b6'
+            },
+            close: {
+                title: "Cierre",
+                desc: "Se finalizan todas las actividades y se transfiere el producto.",
+                flow: "OUTPUT ➔ Producto/Servicio final, Informe de Cierre, Actualización de Activos.<br>DESTINO ➔ Cliente/Operaciones.",
+                paths: [],
+                color: '#2ecc71'
+            }
+        };
+
+        nodes.forEach(node => {
+            node.addEventListener('mouseenter', () => {
+                const phaseKey = node.getAttribute('data-phase');
+                const data = phases[phaseKey];
+
+                // Update text
+                infoTitle.textContent = data.title;
+                infoDesc.textContent = data.desc;
+                flowDetail.innerHTML = data.flow;
+                infoBox.style.borderLeftColor = data.color;
+
+                // Reset paths
+                document.querySelectorAll('.connection-line').forEach(p => {
+                    p.classList.remove('highlight-path');
+                    p.setAttribute('marker-end', 'url(#arrowhead)');
+                });
+
+                // Highlight outgoing paths
+                data.paths.forEach(pathId => {
+                    const path = document.getElementById(pathId);
+                    if(path) {
+                        path.classList.add('highlight-path');
+                        path.setAttribute('marker-end', 'url(#arrowhead-active)');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

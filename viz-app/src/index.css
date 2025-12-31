@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        /* Indigo 600 */
+        --color-primary: 79 70 229;
+        /* Slate 50 */
+        --color-background: 248 250 252;
+        /* White */
+        --color-surface: 255 255 255;
+        /* Slate 900 */
+        --color-text-main: 15 23 42;
+        /* Slate 500 */
+        --color-text-muted: 100 116 139;
+        /* Slate 200 */
+        --color-border: 226 232 240;
+    }
+
+    .dark {
+        /* Indigo 400 */
+        --color-primary: 129 140 248;
+        /* Slate 950 */
+        --color-background: 2 6 23;
+        /* Slate 900 */
+        --color-surface: 15 23 42;
+        /* Slate 50 */
+        --color-text-main: 248 250 252;
+        /* Slate 400 */
+        --color-text-muted: 148 163 184;
+        /* Slate 800 */
+        --color-border: 30 41 59;
+    }
+
+    body {
+        @apply bg-background text-text-main transition-colors duration-300;
+    }
+}

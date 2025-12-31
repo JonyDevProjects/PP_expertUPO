@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matriz de Procesos PMBOK® - Interactivo</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --text-main: #2c3e50;
+            --header-bg: #2c3e50;
+            --header-text: #ffffff;
+            
+            /* Colores por Grupo de Proceso */
+            --color-init: #f1c40f; /* Amarillo - Iniciación */
+            --color-plan: #3498db; /* Azul - Planificación */
+            --color-exec: #e74c3c; /* Rojo - Ejecución */
+            --color-mon: #9b59b6;  /* Morado - Monitoreo */
+            --color-close: #2ecc71; /* Verde - Cierre */
+            
+            --cell-empty: #ecf0f1;
+            --cell-hover: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 { margin-bottom: 5px; color: var(--text-main); }
+        p.subtitle { color: #7f8c8d; margin-bottom: 30px; font-size: 0.95rem; }
+
+        /* Contenedor Principal Grid */
+        .matrix-container {
+            display: grid;
+            grid-template-columns: 180px repeat(5, 1fr); /* 1 columna etiquetas + 5 grupos */
+            gap: 4px;
+            background-color: #bdc3c7;
+            padding: 4px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            max-width: 1000px;
+            width: 100%;
+            overflow-x: auto; /* Para móviles */
+        }
+
+        /* Cabeceras */
+        .header-cell {
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            padding: 12px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+        }
+        
+        .header-row-label {
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            justify-content: flex-start;
+            padding-left: 15px;
+            border-top-left-radius: 6px;
+            border-bottom-left-radius: 6px;
+        }
+
+        .header-col-label { border-radius: 4px; }
+        
+        /* Celdas de la Matriz */
+        .matrix-cell {
+            background-color: var(--cell-empty);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: default;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .matrix-cell.active {
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: inset 0 0 0 2px rgba(255,255,255,0.1);
+        }
+
+        .matrix-cell.active:hover {
+            transform: scale(1.05);
+            z-index: 10;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            filter: brightness(1.1);
+        }
+
+        /* Colores Específicos */
+        .col-init { background-color: var(--color-init); color: #34495e; } /* Texto oscuro para amarillo */
+        .col-plan { background-color: var(--color-plan); }
+        .col-exec { background-color: var(--color-exec); }
+        .col-mon { background-color: var(--color-mon); }
+        .col-close { background-color: var(--color-close); }
+
+        /* Etiquetas de filas */
+        .row-label {
+            background-color: #dfe6e9;
+            padding: 10px 15px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            color: #2d3436;
+        }
+
+        /* Panel de Detalles (Abajo) */
+        #detail-panel {
+            margin-top: 30px;
+            background-color: white;
+            width: 100%;
+            max-width: 1000px;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            min-height: 120px;
+            border-left: 6px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        #detail-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--text-main);
+        }
+
+        #detail-content {
+            font-size: 1rem;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .hint { font-size: 0.8rem; color: #999; margin-top: 10px; font-style: italic; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .matrix-container { grid-template-columns: 120px repeat(5, 1fr); }
+            .header-cell, .row-label { font-size: 0.7rem; padding: 5px; }
+            .matrix-cell { height: 40px; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Matriz de Procesos y Áreas de Conocimiento</h1>
+    <p class="subtitle">Intersección entre "Qué gestionamos" y "Cuándo lo gestionamos" (Según PDF y PMBOK®)</p>
+
+    <div class="matrix-container">
+        <!-- Header Row -->
+        <div class="header-cell header-row-label">Áreas / Grupos</div>
+        <div class="header-cell header-col-label" style="background-color: var(--color-init); color: #2c3e50;">Iniciación</div>
+        <div class="header-cell header-col-label" style="background-color: var(--color-plan);">Planif.</div>
+        <div class="header-cell header-col-label" style="background-color: var(--color-exec);">Ejecución</div>
+        <div class="header-cell header-col-label" style="background-color: var(--color-mon);">Control</div>
+        <div class="header-cell header-col-label" style="background-color: var(--color-close);">Cierre</div>
+
+        <!-- Row 1: Integración -->
+        <div class="row-label">1. Integración</div>
+        <div class="matrix-cell active col-init" data-title="Integración / Iniciación" data-desc="• Desarrollar el Acta de Constitución (Project Charter).<br>• Autorizar formalmente el proyecto.">●</div>
+        <div class="matrix-cell active col-plan" data-title="Integración / Planificación" data-desc="• Desarrollar el Plan para la Dirección del Proyecto (Plan Maestro).">●</div>
+        <div class="matrix-cell active col-exec" data-title="Integración / Ejecución" data-desc="• Dirigir y Gestionar el trabajo del proyecto.<br>• Gestionar el conocimiento del proyecto.">●</div>
+        <div class="matrix-cell active col-mon" data-title="Integración / Control" data-desc="• Monitorear y Controlar el trabajo.<br>• Realizar el Control Integrado de Cambios (Aprobar/Rechazar cambios).">●</div>
+        <div class="matrix-cell active col-close" data-title="Integración / Cierre" data-desc="• Cerrar el Proyecto o Fase.<br>• Transferir el entregable final.">●</div>
+
+        <!-- Row 2: Alcance -->
+        <div class="row-label">2. Alcance</div>
+        <div class="matrix-cell"></div>
+        <div class="matrix-cell active col-plan" data-title="Alcance / Planificación" data-desc="• Planificar gestión del alcance.<br>• Recopilar requisitos.<br>• Definir el alcance.<br>• Crear la EDT (WBS).">●</div>
+        <div class="matrix-cell"></div>
+        <div class="matrix-cell active col-mon" data-title="Alcance / Control" data-desc="• Validar el Alcance (Aceptación formal de entregables).<br>• Controlar el Alcance (Evitar 'Gold Plating').">●</div>
+        <div class="matrix-cell"></div>
+
+        <!-- Row 3: Tiempo -->
+        <div class="row-label">3. Tiempo (Cronograma)</div>
+        <div class="matrix-cell"></div>
+        <div class="matrix-cell active col-plan" data-title="Tiempo / Planificación" data-desc="• Definir actividades.<br>• Secuenciar actividades.<br>• Estimar duración.<br>• Desarrollar el Cronograma (Gantt, Ruta Crítica).">●</div>
+        <div class="matrix-cell"></div>
+        <div class="matrix-cell active col-mon" data-title="Tiempo / Control" data-desc="• Controlar el Cronograma (Analizar desviaciones y proponer correcciones).">●</div>
+        <div class="matrix-cell"></div>
+
+        <!-- Row 4: Coste -->
+        <div class="row-label">4. Coste</div>
+        <div class="matrix-cell"></div>
+        <div class="matrix-cell active col-plan" data-title="Coste / Planificación" data-desc="• Estimar costos.<br>• Determinar el presupuesto (Línea Base de Costos).">●</div>
+        <div class="matrix-cell"></div>
+        <div class="matrix-cell active col-mon" data-title="Coste / Control" data-desc="• Controlar los Costos.<br>• Análisis de Valor Ganado (EVM).">●</div>
+        <div class="matrix-cell"></div>
+
+        <!-- Row 5: Calidad -->
+        <div class="row-label">5. Calidad</div>
+        <div class="matrix-cell"></div>
+        <div class="matrix-cell active col-plan" data-title="Calidad / Planificación" data-desc="• Planificar la Gestión de Calidad (Definir estándares y métricas).">●</div>
+        <div class="matrix-cell active col-exec" data-title="Calidad / Ejecución" data-desc="• Gestionar la Calidad (Auditorías de calidad, Aseguramiento QA).">●</div>
+        <div class="matrix-cell active col-mon" data-title="Calidad / Control" data-desc="• Controlar la Calidad (QC - Inspección de entregables).">●</div>
+        <div class="matrix-cell"></div>
+
+        <!-- Row 6: Recursos (RRHH) -->
+        <div class="row-label">6. Recursos (RRHH)</div>
+        <div class="matrix-cell"></div>
+        <div class="matrix-cell active col-plan" data-title="Recursos / Planificación" data-desc="• Estimar recursos de actividades.<br>• Planificar gestión de recursos.">●</div>
+        <div class="matrix-cell active col-exec" data-title="Recursos / Ejecución" data-desc="• Adquirir recursos.<br>• Desarrollar el equipo (Team Building).<br>• Dirigir al equipo.">●</div>
+        <div class="matrix-cell active col-mon" data-title="Recursos / Control" data-desc="• Controlar los recursos (Físicos y disponibilidad).">●</div>
+        <div class="matrix-cell"></div>
+
+        <!-- Row 7: Comunicaciones -->
+        <div class="row-label">7. Comunicaciones</div>
+        <div class="matrix-cell"></div>
+        <div class="matrix-cell active col-plan" data-title="Comunicaciones / Planificación" data-desc="• Planificar la gestión de las comunicaciones (Quién necesita qué, cuándo y cómo).">●</div>
+        <div class="matrix-cell active col-exec" data-title="Comunicaciones / Ejecución" data-desc="• Gestionar las comunicaciones (Informes de desempeño, distribucion de info).">●</div>
+        <div class="matrix-cell active col-mon" data-title="Comunicaciones / Control" data-desc="• Monitorear las comunicaciones.">●</div>
+        <div class="matrix-cell"></div>
+
+        <!-- Row 8: Riesgos -->
+        <div class="row-label">8. Riesgos</div>
+        <div class="matrix-cell"></div>
+        <div class="matrix-cell active col-plan" data-title="Riesgos / Planificación" data-desc="• Identificar riesgos.<br>• Análisis Cualitativo y Cuantitativo.<br>• Planificar respuesta a los riesgos.">●</div>
+        <div class="matrix-cell active col-exec" data-title="Riesgos / Ejecución" data-desc="• Implementar respuesta a los riesgos.">●</div>
+        <div class="matrix-cell active col-mon" data-title="Riesgos / Control" data-desc="• Monitorear los riesgos (Revisar si surgen nuevos o si las respuestas funcionan).">●</div>
+        <div class="matrix-cell"></div>
+
+        <!-- Row 9: Adquisiciones -->
+        <div class="row-label">9. Adquisiciones</div>
+        <div class="matrix-cell"></div>
+        <div class="matrix-cell active col-plan" data-title="Adquisiciones / Planificación" data-desc="• Planificar gestión de adquisiciones (Hacer vs Comprar, tipo de contrato).">●</div>
+        <div class="matrix-cell active col-exec" data-title="Adquisiciones / Ejecución" data-desc="• Efectuar las adquisiciones (Seleccionar vendedores, firmar contratos).">●</div>
+        <div class="matrix-cell active col-mon" data-title="Adquisiciones / Control" data-desc="• Controlar las adquisiciones (Administrar contratos, cerrar pagos).">●</div>
+        <div class="matrix-cell active col-close" data-title="Adquisiciones / Cierre" data-desc="• Cierre administrativo de contratos.">●</div>
+
+        <!-- Row 10: Interesados -->
+        <div class="row-label">10. Interesados</div>
+        <div class="matrix-cell active col-init" data-title="Interesados / Iniciación" data-desc="• Identificar a los interesados (Stakeholders).<br>• Crear registro de interesados.">●</div>
+        <div class="matrix-cell active col-plan" data-title="Interesados / Planificación" data-desc="• Planificar el involucramiento de los interesados.">●</div>
+        <div class="matrix-cell active col-exec" data-title="Interesados / Ejecución" data-desc="• Gestionar la participación de los interesados.">●</div>
+        <div class="matrix-cell active col-mon" data-title="Interesados / Control" data-desc="• Monitorear el involucramiento.">●</div>
+        <div class="matrix-cell"></div>
+    </div>
+
+    <div id="detail-panel">
+        <div id="detail-title">Selecciona una celda activa</div>
+        <div id="detail-content">Haz clic (o pasa el ratón) sobre cualquier punto de color (●) para ver qué procesos de gestión ocurren en esa intersección.</div>
+        <div class="hint">Nota: Basado en la matriz del documento PDF y enriquecido con procesos estándar PMBOK®.</div>
+    </div>
+
+    <script>
+        const cells = document.querySelectorAll('.matrix-cell.active');
+        const detailPanel = document.getElementById('detail-panel');
+        const detailTitle = document.getElementById('detail-title');
+        const detailContent = document.getElementById('detail-content');
+
+        cells.forEach(cell => {
+            // Hover events
+            cell.addEventListener('mouseenter', () => {
+                showDetails(cell);
+            });
+
+            // Click events (para movil o fijar)
+            cell.addEventListener('click', () => {
+                showDetails(cell);
+            });
+        });
+
+        function showDetails(cell) {
+            const title = cell.getAttribute('data-title');
+            const desc = cell.getAttribute('data-desc');
+            const color = window.getComputedStyle(cell).backgroundColor;
+
+            detailTitle.textContent = title;
+            detailTitle.style.color = color === 'rgb(241, 196, 15)' ? '#d35400' : color; // Ajuste contraste amarillo
+            detailContent.innerHTML = desc;
+            
+            detailPanel.style.borderLeftColor = color;
+            detailPanel.style.backgroundColor = '#fafafa';
+        }
+    </script>
+</body>
+</html>
