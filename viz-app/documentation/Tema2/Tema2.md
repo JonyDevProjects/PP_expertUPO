@@ -13,7 +13,7 @@ Es la fuente de informacion básica para controlar el proyecto y debe ser aproba
 ### 2.2 Proceso Previos a la Planificacion
 
 - **Relacion Procesos de Negocio - Areas de Conocimiento**
-![Matriz_Procesos-Areas](Matriz.jpg)
+![Matriz_Procesos-Areas](../Matriz.jpg)
 
 1. **La Génesis (Origen y Valoración)**
 * **El detonante:** Obsolescencia, competencia, requisitos legales o mejora de eficiencia.

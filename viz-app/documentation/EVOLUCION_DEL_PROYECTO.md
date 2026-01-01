@@ -23,12 +23,14 @@ viz-app/                 # Raíz del proyecto Web (Vite + React)
 │   ├── components/      # Componentes de la UI
 │   │   ├── shared/      # Componentes reutilizables (ej. SlideContainer)
 │   │   └── slides/      # Componentes específicos de cada diapositiva
+│   │       ├── Tema2/   # [NUEVO] Componentes específicos del Tema 2
 │   ├── data/            # Datos estáticos y configuraciones
 │   ├── utils/           # Funciones de utilidad (ej. drawingUtils)
-│   ├── App.tsx          # Componente principal (Punto de entrada)
+│   ├── App.tsx          # Componente principal (Gestor de Temas)
 │   ├── main.tsx         # Montaje de React en el DOM
 │   ├── index.css        # Estilos globales (Tailwind CSS)
-│   └── Tema1_Infografic.tsx # Orquestador principal
+│   ├── Tema1_Infografic.tsx # Orquestador Tema 1
+│   └── Tema2_Infografic.tsx # [NUEVO] Orquestador Tema 2
 ├── documentation/       # Documentación y Referencias
 │   ├── EVOLUCION_DEL_PROYECTO.md # (Este archivo)
 │   └── EBs-PP-Tema(1-7)-compressed.pdf # Material teórico base
@@ -70,7 +72,21 @@ Se profundizó la refactorización para garantizar mantenibilidad a largo plazo:
 - **Validación de Build**: El proyecto compila limpiamente (`npm run build`) asegurando que no existen dependencias circulares ni errores de tipos en la nueva estructura modular.
 - **Limpieza de Código**: Se han eliminado definiciones duplicadas y código muerto que residía en el archivo monolítico original.
 
-## 4. Próximos Pasos
+## 4. Ampliación del Alcance: Integración del Tema 2 (Planificación)
+
+Para demostrar la escalabilidad de la arquitectura propuesta, se integró un segundo módulo temático completo.
+
+### A. Componentes del Tema 2
+Se migraron y adaptaron visualizaciones que antes residían en documentación al árbol de código fuente:
+- **`SlidePrePlanning.tsx`**: Cubre la fase de Génesis y Valoración previa al plan.
+- **`SlidePlanning.tsx`**: Detalla las áreas de conocimiento (Alcance, Tiempo, Coste, etc.) en una interfaz de pestañas verticales.
+- **`SlidePlanAndBaseline.tsx`**: Muestra la estructura del Plan Maestro y las Líneas Base.
+
+### B. Navegación Multi-Tema
+- **Selector de Temas**: Se modificó `App.tsx` para incluir una navegación de nivel superior que permite alternar entre "Tema 1" y "Tema 2".
+- **Consistencia Visual**: Se mantuvo el lenguaje de diseño pero variando la paleta de colores (Índigo para Tema 1, Verde Azulado/Teal para Tema 2) para dar identidad visual a cada módulo.
+
+## 5. Próximos Pasos
 - **Optimización de Interacciones**: Refinar las micro-interacciones y animaciones para una experiencia más fluida.
 - **Cobertura de Pruebas**: Implementar tests unitarios para las utilidades críticas y tests E2E para los flujos principales.
 - **Accesibilidad**: Auditoría completa de contraste y navegación por teclado.

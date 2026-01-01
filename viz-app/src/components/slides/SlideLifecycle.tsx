@@ -46,7 +46,7 @@ const SlideLifecycle = () => (
                 <h3 className="font-bold text-primary mb-4 flex items-center">
                     <Layers className="w-5 h-5" /> Metodologías
                 </h3>
-                <p className="text-xs text-text-muted gap-3">Son los marcos de trabajo (como SCRUM o CRISP-DM) que nos dan las herramientas y procesos para gestionar el trabajo.</p>
+                <p className="text-xs text-text-muted gap-3 mb-4">Son los marcos de trabajo (como SCRUM o CRISP-DM) que nos dan las herramientas y procesos para gestionar el trabajo.</p>
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
                     <div className="bg-surface p-4 rounded shadow-sm border-t-4 border-blue-500 hover:-translate-y-1 transition-transform cursor-default">
                         <h4 className="font-bold text-text-main">Predictiva (Waterfall)</h4>
