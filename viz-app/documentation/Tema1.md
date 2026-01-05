@@ -1,4 +1,4 @@
-## Tema 1
+## Tema 1: Introducción a la Dirección y la Gestión de Proyectos Software.
 
 ### 1. ¿Qué es (y qué no es) un Proyecto?
 
@@ -37,7 +37,7 @@
 *  **Metodologías (de Desarrollo):** Son los marcos de trabajo (como SCRUM o CRISP-DM) que nos dan las herramientas y procesos para gestionar el trabajo.
 
 * **Gestión de Proyectos:** 
-    * **Procesos de Negocio:** 
+    * **Procesos de Gestión:** 
     ```mermaid
     gantt
     title Diagrama Gantt con Seguimiento y Control superpuesto
@@ -71,11 +71,11 @@
 
 ### 3. Gestion de Proyectos
 
-Forma de organizar el trabajo para alcanzar sese objetivo **único** y **temporal**.
+Forma de organizar el trabajo para alcanzar ese objetivo **único** y **temporal**.
 
 * **Funciones**:
-    * **Planificar**: Definir los resultados buscado y cómo conseguilos.
-    * **Organizar**: Asignar los tareas planificadas a las personas y equipos.
+    * **Planificar**: Definir los resultados buscados y cómo conseguirlos.
+    * **Organizar**: Asignar las tareas planificadas a las personas y equipos.
     * **Controlar**: Comprobar si se están logrando los resultados y corregir desviaciones.
     * **Dirigir**: Liderar y motivar al equipo para alcanzar los objetivos.
 
@@ -83,7 +83,7 @@ Forma de organizar el trabajo para alcanzar sese objetivo **único** y **tempora
 * **La Triple Restricción:** La calidad del producto final depende del equilibrio entre tres factores :
 
     * **Alcance**: si aumenta el Alcance, entonces aumenta el Coste o el Tiempo.
-    * **Tiempo**: si reduces el Tiempo, entonces aumentas el Costes o reduces el Alcance.
+    * **Tiempo**: si reduces el Tiempo, entonces aumentas el Coste o reduces el Alcance.
     * **Coste**: si reduces el Coste, entonces reduces el Alcance o aumentas el Tiempo.
 
 * **Procesos de Gestión de Proyectos:**
@@ -107,11 +107,11 @@ Forma de organizar el trabajo para alcanzar sese objetivo **único** y **tempora
 - **Alcance:** Asegurar que se cumplen los objetivos.
 - **Tiempo:** Controlar los plazos acordados.
 - **Coste:** Controlar que el proyecto se mantenga dentro del presupuesto.
-- **Calidad:** Vefificar que el producto/servicio satisfaga las necesidades del cliente.
-- **RRHH:** Gestionar eficarmente a las personas involucradas.
-- **Comunicación:** Asegura ue la informacion segenera, distribuye y almacena correctamente.
-- **Riesgos:** Identificar, analiazar y respionder a los posibles problemas.
-- **Adquisiciones:** Comprar bienes y serivcios a terceros.
+- **Calidad:** Verificar que el producto/servicio satisfaga las necesidades del cliente.
+- **RRHH:** Gestionar eficazmente a las personas involucradas.
+- **Comunicación:** Asegura que la información se genera, distribuye y almacena correctamente.
+- **Riesgos:** Identificar, analizar y responder a los posibles problemas.
+- **Adquisiciones:** Comprar bienes y servicios a terceros.
 - **Interesados:** Gestionar la participación y espectativas de todas las personas o grupos afectados por el proyecto.
 
 **Matriz Procesos de Negocio - Áreas de Conocimiento:** 
@@ -132,7 +132,7 @@ Forma de organizar el trabajo para alcanzar sese objetivo **único** y **tempora
 
     * **Soft Skills (Interpersonales):** Liderazgo, negociación, comunicación .
 
-* **Roles Clave de Director de Proyectop:**
+* **Roles Clave de Director de Proyecto:**
     - Defenir el alcance
     - Liderar el equipo
     - Identificar a los intersados
@@ -179,9 +179,9 @@ Este apartado es específico para proyectos con la administración.
     - Hasta 15 000 euros para **otros**
     - No pueden durar más de un año o prorrogarse.
 
-* **Procesimientos Negociados:** 
+* **Procedimientos Negociados:** 
     - La administración negocia con candidatos específicos.
-    - Pueden se con o sin publicidad.
+    - Pueden ser con o sin publicidad.
 
 
 * **Concurso Público:** 

@@ -1,14 +1,14 @@
 
-## Tema 2: Planificación de Proyectos
+## Tema 2: Planificación Inicial y Plan de Proyectos
 ### 2.1 Plan de Proyecto
 Es la fuente de informacion básica para controlar el proyecto y debe ser aprobado de manera formal.
 #### Proposito
-- **Asergurar** que todo el trabajo sea identificado.
+- **Asegurar** que todo el trabajo sea identificado.
 - **Planificar** las actividades en un órden lógico.
 - **Identificar** los riesgos potenciales.
-- **Crear** un calndario realista.
+- **Crear** un calendario realista.
 - **Obtener** compromisos con los inetresado.
-- **Asegurar** que los recursos estarán disponibles cuand sea necesario.
+- **Asegurar** que los recursos estarán disponibles cuando sea necesario.
 
 ### 2.2 Proceso Previos a la Planificacion
 
@@ -40,35 +40,35 @@ Es la fuente de informacion básica para controlar el proyecto y debe ser aproba
 
 
 6. **El Lanzamiento (Constitución)**
-* **Hitos:** Asignación del Project Manager (PM), firma del Project Charter (Acta de Constitución) y reunión de Kick-off.
+* **Hitos:** Asignación del Project Manager (PM), firma del Project Charter (Acta de Constitución), lo que autoriza formalmente el proyecto y da autoridad al PM y reunión de Kick-off(reunión inicial).
 
 ### 2.3 Planificacion
 
 1. **El Decálogo de la Planificación**
 * **Concepto:** No es solo un cronograma. Son 10 planes subsidiarios que forman un todo coherente.
-* **Meta:** Integrar Alcance, Tiempo, Coste, Calidad, RRHH, Comunicaciones, Riesgos, Adquisiciones e Interesados.
+* **Meta:** Integración, Alcance, Tiempo, Coste, Calidad, RRHH, Comunicaciones, Riesgos, Adquisiciones e Interesados.
 
 
 2. **Alcance: El Cimiento (WBS/EDT)**
-* **Acción:** Recopilar requisitos  Definir Alcance  Crear EDT.
-* **Herramienta Estrella:** La **EDT (WBS)**.
+* **Acción:** Recopilar requisitos, definir Alcance, crear EDT.
+* **Herramienta Estrella:** La **EDT (WBS)**(la EDT contiene el 100% del alcance. Si no está en la EDT, no está en el proyecto).
 * **Clave:** Enfoque "Divide y vencerás". Organiza el trabajo en entregables, no en acciones sueltas. Incluye gestión, desarrollo y soporte.
 
 
 3. **Tiempo y Coste: Las Limitaciones**
-* **Tiempo:** Actividades  Secuencia  Recursos  Duración  Cronograma.
-* **Coste:** Estimación por paquete de trabajo  Presupuesto Global  Línea Base.
+* **Tiempo:** Actividades, Secuencia, Recursos, Duración, Cronograma.
+* **Coste:** Estimación por paquete de trabajo, Presupuesto Global, Línea Base.
 * **La Regla:** Si la estimación tiene calidad, el proyecto tendrá calidad.
 
 
 4. **Recursos Humanos: El Motor**
 * **Plan:** Organigrama y Matriz de Roles/Responsabilidades.
-* **Ciclo de Vida del Talento:** Definir  Adquirir  Mantener  Liberar.
+* **Ciclo de Vida del Talento:** Definir, Adquirir, Mantener, Liberar.
 * **Pregunta clave:** ¿Cómo conseguir y utilizar a los mejores profesionales?
 
 
 5. **Riesgos: El Escudo**
-* **Proceso:** Identificar  Análisis Cualitativo/Cuantitativo  Plan de Respuesta.
+* **Proceso:** Identificar, Análisis Cualitativo/Cuantitativo, Plan de Respuesta.
 * **Las 4 Estrategias:** Evitar, Transferir, Mitigar, Aceptar.
 
 

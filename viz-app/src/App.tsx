@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import Tema1_Infografic from './Tema1_Infografic'
 import Tema2_Infografic from './Tema2_Infografic'
+import Tema3_Infografic from './Tema3_Infografic'
 import { ThemeProvider } from './context/ThemeContext'
 import { ThemeToggle } from './components/ui/ThemeToggle'
 
 function App() {
-  const [activeTheme, setActiveTheme] = useState<'tema1' | 'tema2'>('tema1');
+  const [activeTheme, setActiveTheme] = useState<'tema1' | 'tema2' | 'tema3'>('tema1');
 
   return (
     <ThemeProvider>
@@ -24,11 +25,19 @@ function App() {
             >
               Tema 2
             </button>
+            <button
+              onClick={() => setActiveTheme('tema3')}
+              className={`px-4 py-1.5 rounded-full transition-colors ${activeTheme === 'tema3' ? 'bg-blue-600 text-white' : 'text-text-muted hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+            >
+              Tema 3
+            </button>
           </div>
           <ThemeToggle />
         </div>
 
-        {activeTheme === 'tema1' ? <Tema1_Infografic /> : <Tema2_Infografic />}
+        {activeTheme === 'tema1' && <Tema1_Infografic />}
+        {activeTheme === 'tema2' && <Tema2_Infografic />}
+        {activeTheme === 'tema3' && <Tema3_Infografic />}
       </div>
     </ThemeProvider>
   )

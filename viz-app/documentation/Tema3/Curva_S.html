@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curva S Interactiva - Análisis de Variaciones</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap');
+        
+        body { font-family: 'Roboto', sans-serif; background-color: #f1f5f9; }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        /* SVG Styles */
+        svg { overflow: visible; }
+        
+        .line-pv { fill: none; stroke: #3b82f6; stroke-width: 3; stroke-dasharray: 5,5; }
+        .line-ac { fill: none; stroke: #ef4444; stroke-width: 3; }
+        .line-ev { fill: none; stroke: #22c55e; stroke-width: 4; }
+        
+        .dot { transition: all 0.2s ease; cursor: pointer; }
+        .dot:hover { r: 8; }
+
+        .variance-line {
+            stroke-width: 2;
+            stroke-dasharray: 4;
+            animation: dash 1s linear infinite;
+        }
+        
+        @keyframes dash {
+            to { stroke-dashoffset: -8; }
+        }
+
+        /* Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #0f172a;
+            cursor: pointer;
+            margin-top: -8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+            border: 2px solid white;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-white p-6 shadow-md">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-white"><i class="fas fa-chart-area mr-3"></i>La Curva S (EVM)</h1>
+                <p class="text-slate-400 text-sm">Análisis de Desempeño y Variaciones</p>
+            </div>
+            <div class="hidden md:block">
+                <div class="flex space-x-4 text-xs font-mono">
+                    <div class="flex items-center"><span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>PV: Planned Value</div>
+                    <div class="flex items-center"><span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>EV: Earned Value</div>
+                    <div class="flex items-center"><span class="w-3 h-3 bg-red-500 rounded-full mr-2"></span>AC: Actual Cost</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto p-4 md:p-8 space-y-6">
+
+        <!-- MAIN CHART CARD -->
+        <div class="bg-white rounded-xl shadow-lg p-2 md:p-6 border border-slate-200">
+            
+            <!-- Context Header inside Card -->
+            <div class="flex justify-between items-end mb-4 px-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Evolución del Proyecto</h2>
+                    <p class="text-sm text-slate-500">Arrastra el control deslizante para ver las variaciones en cada punto.</p>
+                </div>
+                <div class="text-right">
+                    <span class="block text-xs text-slate-400 font-bold uppercase tracking-wider">Día del Proyecto</span>
+                    <span id="day-display" class="text-3xl font-black text-slate-800">0</span>
+                </div>
+            </div>
+
+            <!-- CHART AREA -->
+            <div class="chart-container bg-slate-50 rounded-lg border-b border-l border-slate-300 mb-6 relative" id="chart-area">
+                <!-- SVG injected by JS -->
+                <svg width="100%" height="100%" viewBox="0 0 1000 400" preserveAspectRatio="none" id="main-svg">
+                    <!-- Grid Lines -->
+                    <defs>
+                        <pattern id="grid" width="100" height="40" patternUnits="userSpaceOnUse">
+                            <path d="M 100 0 L 0 0 0 40" fill="none" stroke="#e2e8f0" stroke-width="1"/>
+                        </pattern>
+                    </defs>
+                    <rect width="100%" height="100%" fill="url(#grid)" />
+                    
+                    <!-- Paths -->
+                    <path id="path-pv" class="line-pv" />
+                    <path id="path-ac" class="line-ac" />
+                    <path id="path-ev" class="line-ev" />
+
+                    <!-- Scrubber Line -->
+                    <line id="scrubber" x1="0" y1="0" x2="0" y2="400" stroke="#0f172a" stroke-width="2" opacity="0" />
+                    
+                    <!-- Variance Connectors -->
+                    <line id="var-cv-line" class="variance-line" stroke="#ef4444" opacity="0" />
+                    <line id="var-sv-line" class="variance-line" stroke="#f59e0b" opacity="0" />
+
+                    <!-- Dots at scrubber intersection -->
+                    <circle id="dot-pv" r="6" fill="#3b82f6" stroke="white" stroke-width="2" opacity="0"/>
+                    <circle id="dot-ac" r="6" fill="#ef4444" stroke="white" stroke-width="2" opacity="0"/>
+                    <circle id="dot-ev" r="6" fill="#22c55e" stroke="white" stroke-width="2" opacity="0"/>
+                </svg>
+
+                <!-- Floating Tooltips (Labels inside chart) -->
+                <div id="label-cv" class="absolute hidden text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded border border-red-200 shadow-sm pointer-events-none" style="transform: translate(10px, -50%);">CV</div>
+                <div id="label-sv" class="absolute hidden text-xs font-bold text-orange-600 bg-orange-100 px-2 py-1 rounded border border-orange-200 shadow-sm pointer-events-none" style="transform: translate(10px, -50%);">SV</div>
+
+            </div>
+
+            <!-- CONTROLS -->
+            <div class="px-4 pb-4">
+                <input type="range" id="time-slider" min="0" max="100" value="0" step="1" oninput="updateChart(this.value)">
+                <div class="flex justify-between text-xs text-slate-400 mt-2 font-mono">
+                    <span>Inicio</span>
+                    <span>50%</span>
+                    <span>Cierre</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- INFO CARDS ROW -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- AC Card -->
+            <div class="bg-white p-5 rounded-xl shadow border-t-4 border-red-500">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-bold text-red-700">Coste Real (AC)</h3>
+                    <i class="fas fa-wallet text-red-200 text-xl"></i>
+                </div>
+                <div class="text-3xl font-black text-slate-800 mb-1" id="val-ac">$0</div>
+                <p class="text-xs text-slate-500">Gasto ejecutado hasta la fecha.</p>
+                <div class="mt-3 pt-3 border-t border-slate-100">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-slate-600">CV (Variación Coste):</span>
+                        <span class="text-sm font-bold" id="val-cv">$0</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-1">Diferencia vertical entre AC y EV.</p>
+                </div>
+            </div>
+
+            <!-- EV Card -->
+            <div class="bg-white p-5 rounded-xl shadow border-t-4 border-green-500 transform scale-105 ring-2 ring-green-100">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-bold text-green-700">Valor Ganado (EV)</h3>
+                    <i class="fas fa-trophy text-green-200 text-xl"></i>
+                </div>
+                <div class="text-3xl font-black text-slate-800 mb-1" id="val-ev">$0</div>
+                <p class="text-xs text-slate-500">Trabajo realmente completado (valorado).</p>
+                <div class="mt-3 pt-3 border-t border-slate-100 bg-green-50 -mx-5 -mb-5 p-4 rounded-b-xl">
+                    <p id="status-text" class="text-center text-sm font-bold text-green-800">Proyecto Iniciado</p>
+                </div>
+            </div>
+
+            <!-- PV Card -->
+            <div class="bg-white p-5 rounded-xl shadow border-t-4 border-blue-500">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-bold text-blue-700">Valor Planificado (PV)</h3>
+                    <i class="fas fa-map text-blue-200 text-xl"></i>
+                </div>
+                <div class="text-3xl font-black text-slate-800 mb-1" id="val-pv">$0</div>
+                <p class="text-xs text-slate-500">Línea Base (Lo que deberíamos llevar).</p>
+                <div class="mt-3 pt-3 border-t border-slate-100">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-slate-600">SV (Variación Cronograma):</span>
+                        <span class="text-sm font-bold" id="val-sv">$0</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-1">Diferencia vertical entre EV y PV.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- EXPLANATION SECTION -->
+        <div class="bg-slate-200 p-4 rounded-lg text-sm text-slate-600 flex items-start space-x-4">
+            <div class="bg-white p-2 rounded-full shadow-sm text-blue-500"><i class="fas fa-info-circle"></i></div>
+            <div>
+                <p class="font-bold text-slate-800 mb-1">¿Cómo leer este gráfico?</p>
+                <ul class="list-disc list-inside space-y-1">
+                    <li>La línea <b>Azul (PV)</b> es tu plan ideal (la referencia).</li>
+                    <li>Si la línea <b>Verde (EV)</b> está <i>debajo</i> de la azul, vas con retraso.</li>
+                    <li>Si la línea <b>Roja (AC)</b> está <i>encima</i> de la verde, estás perdiendo dinero (sobrecoste).</li>
+                    <li>Las líneas punteadas verticales que aparecen al mover el control muestran la magnitud del problema.</li>
+                </ul>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- DATA SIMULATION ---
+        // S-Curve Data Generation
+        const totalPoints = 100;
+        const data = {
+            labels: Array.from({length: totalPoints + 1}, (_, i) => i),
+            pv: [], // Planned Value
+            ac: [], // Actual Cost (Over budget scenario)
+            ev: []  // Earned Value (Late scenario)
+        };
+
+        // Generate Sigmoid-like curves
+        for (let i = 0; i <= totalPoints; i++) {
+            const progress = i / totalPoints;
+            
+            // PV: Perfect S-Curve (Logistic function)
+            // L / (1 + e^-k(x-x0))
+            const sigmoid = (x) => 1 / (1 + Math.exp(-10 * (x - 0.5)));
+            // Normalize slightly to fit 0-100 better
+            let valPV = sigmoid(progress) * 1000; 
+            // Fix edges (0 to 1000 approx)
+            if(i===0) valPV = 0;
+            
+            // EV: Lagging behind PV (starts similar, drops off)
+            // Simulates getting stuck in the middle
+            let valEV = valPV * (0.8 + 0.1 * Math.sin(progress * Math.PI)); 
+            if(i > 80) valEV = valEV * 0.95; // Finishing poorly
+            if(i===0) valEV = 0;
+
+            // AC: Spending more than planned
+            // Simulates throwing money at the problem
+            let valAC = valPV * (1.1 + (progress * 0.3)); 
+            if(i===0) valAC = 0;
+
+            data.pv.push(valPV);
+            data.ev.push(valEV);
+            data.ac.push(valAC);
+        }
+
+        // --- SVG SETUP ---
+        const svgWidth = 1000;
+        const svgHeight = 400;
+        const chartHeight = 380; // Padding
+        const maxY = 1400; // Max value for scaling
+
+        // Helper: Convert Data Value to SVG Coordinate
+        function getX(index) { return (index / totalPoints) * svgWidth; }
+        function getY(value) { return svgHeight - (value / maxY * chartHeight); }
+
+        // Helper: Generate Path String
+        function createPath(dataArray) {
+            let path = `M ${getX(0)} ${getY(dataArray[0])}`;
+            for (let i = 1; i < dataArray.length; i++) {
+                path += ` L ${getX(i)} ${getY(dataArray[i])}`;
+            }
+            return path;
+        }
+
+        // Init Paths
+        document.getElementById('path-pv').setAttribute('d', createPath(data.pv));
+        document.getElementById('path-ac').setAttribute('d', createPath(data.ac));
+        document.getElementById('path-ev').setAttribute('d', createPath(data.ev));
+
+        // --- INTERACTION LOGIC ---
+        function updateChart(index) {
+            index = parseInt(index);
+            
+            // 1. Update Values
+            const curPV = data.pv[index];
+            const curEV = data.ev[index];
+            const curAC = data.ac[index];
+            const cv = curEV - curAC;
+            const sv = curEV - curPV;
+
+            // 2. Update Text Displays
+            document.getElementById('day-display').innerText = `Día ${index}`;
+            document.getElementById('val-pv').innerText = `$${Math.round(curPV)}`;
+            document.getElementById('val-ev').innerText = `$${Math.round(curEV)}`;
+            document.getElementById('val-ac').innerText = `$${Math.round(curAC)}`;
+
+            // CV Coloring
+            const cvEl = document.getElementById('val-cv');
+            cvEl.innerText = `$${Math.round(cv)}`;
+            cvEl.className = cv < 0 ? "text-sm font-bold text-red-600" : "text-sm font-bold text-green-600";
+
+            // SV Coloring
+            const svEl = document.getElementById('val-sv');
+            svEl.innerText = `$${Math.round(sv)}`;
+            svEl.className = sv < 0 ? "text-sm font-bold text-red-600" : "text-sm font-bold text-green-600";
+
+            // Status Text
+            const statusEl = document.getElementById('status-text');
+            if (index === 0) {
+                statusEl.innerText = "Proyecto Iniciado";
+                statusEl.className = "text-center text-sm font-bold text-slate-500";
+            } else if (cv < 0 && sv < 0) {
+                statusEl.innerText = "⚠️ CRÍTICO: Retrasado y Sobrecoste";
+                statusEl.className = "text-center text-sm font-bold text-red-600 animate-pulse";
+            } else if (cv < 0) {
+                statusEl.innerText = "Sobre Presupuesto";
+                statusEl.className = "text-center text-sm font-bold text-orange-600";
+            } else if (sv < 0) {
+                statusEl.innerText = "Retrasado";
+                statusEl.className = "text-center text-sm font-bold text-orange-600";
+            } else {
+                statusEl.innerText = "Buen desempeño";
+                statusEl.className = "text-center text-sm font-bold text-green-600";
+            }
+
+            // 3. Update Chart Elements
+            const xPos = getX(index);
+            
+            // Move Scrubber
+            const scrubber = document.getElementById('scrubber');
+            scrubber.setAttribute('x1', xPos); scrubber.setAttribute('x2', xPos);
+            scrubber.setAttribute('opacity', 1);
+
+            // Move Dots
+            updateDot('dot-pv', xPos, curPV);
+            updateDot('dot-ac', xPos, curAC);
+            updateDot('dot-ev', xPos, curEV);
+
+            // Draw Variance Lines (Vertical Arrows)
+            drawVarianceLine('var-cv-line', xPos, curAC, curEV, 'label-cv', 'CV');
+            drawVarianceLine('var-sv-line', xPos, curPV, curEV, 'label-sv', 'SV');
+        }
+
+        function updateDot(id, x, val) {
+            const dot = document.getElementById(id);
+            dot.setAttribute('cx', x);
+            dot.setAttribute('cy', getY(val));
+            dot.setAttribute('opacity', 1);
+        }
+
+        function drawVarianceLine(id, x, yStartVal, yEndVal, labelId, text) {
+            const line = document.getElementById(id);
+            const label = document.getElementById(labelId);
+            
+            if (Math.abs(yStartVal - yEndVal) < 10) {
+                // Too small to show
+                line.setAttribute('opacity', 0);
+                label.classList.add('hidden');
+                return;
+            }
+
+            const y1 = getY(yStartVal);
+            const y2 = getY(yEndVal);
+
+            line.setAttribute('x1', x);
+            line.setAttribute('x2', x);
+            line.setAttribute('y1', y1);
+            line.setAttribute('y2', y2);
+            line.setAttribute('opacity', 1);
+
+            // Position Label (middle of line)
+            label.classList.remove('hidden');
+            const midY = (y1 + y2) / 2;
+            label.style.top = `${midY}px`;
+            label.style.left = `${x}px`;
+        }
+
+        // Init
+        setTimeout(() => updateChart(25), 500); // Start at 25% to show something
+    </script>
+</body>
+</html>

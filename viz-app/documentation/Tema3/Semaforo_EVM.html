@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semáforo EVM - Dashboard de Control</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap');
+        
+        body { font-family: 'Roboto', sans-serif; background-color: #f8fafc; }
+        
+        /* Gauge Animation */
+        .gauge-needle {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: bottom center;
+        }
+        
+        .card-transition {
+            transition: all 0.3s ease;
+        }
+
+        /* Custom Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none; 
+            background: transparent; 
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px; width: 20px;
+            border-radius: 50%;
+            background: #2563eb;
+            cursor: pointer;
+            margin-top: -8px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px;
+            cursor: pointer;
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-white p-6 shadow-lg">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-black text-yellow-400"><i class="fas fa-chart-line mr-3"></i>Semáforo EVM</h1>
+                <p class="text-slate-400 text-sm mt-1">Gestión del Valor Ganado: Simulador de Salud del Proyecto</p>
+            </div>
+            <div class="text-right hidden md:block">
+                <span class="bg-slate-800 px-3 py-1 rounded text-xs text-slate-300 border border-slate-700">Estándar PMI / PMBOK®</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-6">
+        
+        <!-- CONTROL PANEL (INPUTS) -->
+        <section class="mb-10 bg-white p-6 rounded-xl shadow-md border-l-8 border-blue-500">
+            <h2 class="text-xl font-bold mb-6 text-slate-800 flex items-center">
+                <span class="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">1</span>
+                Panel de Control: Introduce tus datos
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- PV Input -->
+                <div class="space-y-2">
+                    <div class="flex justify-between">
+                        <label class="font-bold text-slate-600">Valor Planificado (PV)</label>
+                        <span id="val-pv" class="text-blue-600 font-mono font-bold">$1000</span>
+                    </div>
+                    <input type="range" id="input-pv" min="100" max="2000" value="1000" class="w-full" oninput="updateDashboard()">
+                    <p class="text-xs text-slate-400">¿Cuánto trabajo <b>deberías</b> haber hecho?</p>
+                </div>
+
+                <!-- EV Input -->
+                <div class="space-y-2">
+                    <div class="flex justify-between">
+                        <label class="font-bold text-slate-600">Valor Ganado (EV)</label>
+                        <span id="val-ev" class="text-purple-600 font-mono font-bold">$1000</span>
+                    </div>
+                    <input type="range" id="input-ev" min="100" max="2000" value="1000" class="w-full" oninput="updateDashboard()">
+                    <p class="text-xs text-slate-400">¿Cuánto trabajo <b>has hecho realmente</b>?</p>
+                </div>
+
+                <!-- AC Input -->
+                <div class="space-y-2">
+                    <div class="flex justify-between">
+                        <label class="font-bold text-slate-600">Coste Real (AC)</label>
+                        <span id="val-ac" class="text-orange-600 font-mono font-bold">$1000</span>
+                    </div>
+                    <input type="range" id="input-ac" min="100" max="2000" value="1000" class="w-full" oninput="updateDashboard()">
+                    <p class="text-xs text-slate-400">¿Cuánto <b>has gastado</b>?</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DASHBOARD (OUTPUTS) -->
+        <section>
+            <h2 class="text-xl font-bold mb-6 text-slate-800 flex items-center">
+                <span class="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">2</span>
+                Diagnóstico de Salud
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- COSTE (BILLETES) -->
+                <div id="card-cost" class="card-transition bg-white rounded-2xl shadow-lg p-6 border border-slate-200 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10">
+                        <i class="fas fa-money-bill-wave fa-8x"></i>
+                    </div>
+                    
+                    <div class="relative z-10">
+                        <h3 class="text-lg font-bold text-slate-500 uppercase tracking-wider mb-4"><i class="fas fa-money-bill-wave mr-2"></i>Eficiencia de Coste</h3>
+                        
+                        <div class="flex items-end justify-between mb-2">
+                            <div>
+                                <span class="text-sm text-slate-400 block">CPI (Índice)</span>
+                                <span id="display-cpi" class="text-5xl font-black text-slate-800">1.00</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-sm text-slate-400 block">CV (Variación)</span>
+                                <span id="display-cv" class="text-2xl font-bold text-slate-800">$0</span>
+                            </div>
+                        </div>
+
+                        <!-- Status Bar -->
+                        <div class="w-full h-4 bg-slate-200 rounded-full mt-4 overflow-hidden relative">
+                            <div class="absolute w-1/2 h-full bg-red-400 left-0"></div> <!-- Zona Roja -->
+                            <div class="absolute w-1/2 h-full bg-green-400 right-0"></div> <!-- Zona Verde -->
+                            <div id="marker-cpi" class="absolute h-6 w-1 bg-black top-[-4px] left-1/2 transition-all duration-500"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-400 mt-1">
+                            <span>Gastando de más (< 1)</span>
+                            <span>Ahorrando (> 1)</span>
+                        </div>
+
+                        <div id="msg-cost" class="mt-6 p-3 rounded-lg bg-slate-100 text-center font-bold text-slate-600">
+                            En Presupuesto
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TIEMPO (RELOJES) -->
+                <div id="card-time" class="card-transition bg-white rounded-2xl shadow-lg p-6 border border-slate-200 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10">
+                        <i class="fas fa-clock fa-8x"></i>
+                    </div>
+                    
+                    <div class="relative z-10">
+                        <h3 class="text-lg font-bold text-slate-500 uppercase tracking-wider mb-4"><i class="fas fa-clock mr-2"></i>Eficiencia de Cronograma</h3>
+                        
+                        <div class="flex items-end justify-between mb-2">
+                            <div>
+                                <span class="text-sm text-slate-400 block">SPI (Índice)</span>
+                                <span id="display-spi" class="text-5xl font-black text-slate-800">1.00</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-sm text-slate-400 block">SV (Variación)</span>
+                                <span id="display-sv" class="text-2xl font-bold text-slate-800">$0</span>
+                            </div>
+                        </div>
+
+                        <!-- Status Bar -->
+                        <div class="w-full h-4 bg-slate-200 rounded-full mt-4 overflow-hidden relative">
+                            <div class="absolute w-1/2 h-full bg-red-400 left-0"></div> <!-- Zona Roja -->
+                            <div class="absolute w-1/2 h-full bg-green-400 right-0"></div> <!-- Zona Verde -->
+                            <div id="marker-spi" class="absolute h-6 w-1 bg-black top-[-4px] left-1/2 transition-all duration-500"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-400 mt-1">
+                            <span>Retrasado (< 1)</span>
+                            <span>Adelantado (> 1)</span>
+                        </div>
+
+                        <div id="msg-time" class="mt-6 p-3 rounded-lg bg-slate-100 text-center font-bold text-slate-600">
+                            En Cronograma
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- CHEAT SHEET -->
+        <section class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+            <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                <h4 class="font-bold text-green-800 mb-2"><i class="fas fa-check-circle mr-2"></i>Zona Verde (> 1.0)</h4>
+                <ul class="list-disc list-inside text-green-700 space-y-1">
+                    <li><b>CPI > 1:</b> El proyecto cuesta menos de lo planeado. Ahorro.</li>
+                    <li><b>SPI > 1:</b> El trabajo avanza más rápido de lo planeado. Adelanto.</li>
+                </ul>
+            </div>
+            <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                <h4 class="font-bold text-red-800 mb-2"><i class="fas fa-exclamation-triangle mr-2"></i>Zona Roja (< 1.0)</h4>
+                <ul class="list-disc list-inside text-red-700 space-y-1">
+                    <li><b>CPI < 1:</b> Estamos gastando más de lo que producimos. Sobrecoste.</li>
+                    <li><b>SPI < 1:</b> El trabajo va más lento de lo planeado. Retraso.</li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        function updateDashboard() {
+            // 1. Get Values
+            const pv = parseFloat(document.getElementById('input-pv').value);
+            const ev = parseFloat(document.getElementById('input-ev').value);
+            const ac = parseFloat(document.getElementById('input-ac').value);
+
+            // Update Labels
+            document.getElementById('val-pv').innerText = `$${pv}`;
+            document.getElementById('val-ev').innerText = `$${ev}`;
+            document.getElementById('val-ac').innerText = `$${ac}`;
+
+            // 2. Calculations
+            const cv = ev - ac;
+            const sv = ev - pv;
+            
+            // Avoid division by zero
+            let cpi = ac === 0 ? (ev > 0 ? 2 : 1) : (ev / ac);
+            let spi = pv === 0 ? (ev > 0 ? 2 : 1) : (ev / pv);
+            
+            // Limit for display purposes (cap at 2.0 for visual bars)
+            const cpiDisplay = cpi.toFixed(2);
+            const spiDisplay = spi.toFixed(2);
+
+            // 3. Update DOM - COST
+            const dispCV = document.getElementById('display-cv');
+            const dispCPI = document.getElementById('display-cpi');
+            const cardCost = document.getElementById('card-cost');
+            const msgCost = document.getElementById('msg-cost');
+            const markerCPI = document.getElementById('marker-cpi');
+
+            dispCV.innerText = `$${cv}`;
+            dispCPI.innerText = cpiDisplay;
+
+            // Logic visual Cost
+            // Map 0-2 range to 0-100% (1 is 50%)
+            let cpiPercent = (cpi / 2) * 100;
+            if(cpiPercent > 100) cpiPercent = 100;
+            if(cpiPercent < 0) cpiPercent = 0;
+            markerCPI.style.left = `${cpiPercent}%`;
+
+            if (cpi < 1) {
+                dispCPI.className = "text-5xl font-black text-red-600";
+                dispCV.className = "text-2xl font-bold text-red-600";
+                cardCost.className = "card-transition bg-white rounded-2xl shadow-lg p-6 border-l-8 border-red-500 relative overflow-hidden";
+                msgCost.className = "mt-6 p-3 rounded-lg bg-red-100 text-center font-bold text-red-700";
+                msgCost.innerHTML = "<i class='fas fa-arrow-down mr-2'></i> SOBRE PRESUPUESTO (Ineficiente)";
+            } else if (cpi > 1) {
+                dispCPI.className = "text-5xl font-black text-green-600";
+                dispCV.className = "text-2xl font-bold text-green-600";
+                cardCost.className = "card-transition bg-white rounded-2xl shadow-lg p-6 border-l-8 border-green-500 relative overflow-hidden";
+                msgCost.className = "mt-6 p-3 rounded-lg bg-green-100 text-center font-bold text-green-700";
+                msgCost.innerHTML = "<i class='fas fa-arrow-up mr-2'></i> BAJO PRESUPUESTO (Eficiente)";
+            } else {
+                dispCPI.className = "text-5xl font-black text-slate-800";
+                dispCV.className = "text-2xl font-bold text-slate-800";
+                cardCost.className = "card-transition bg-white rounded-2xl shadow-lg p-6 border-l-8 border-slate-300 relative overflow-hidden";
+                msgCost.className = "mt-6 p-3 rounded-lg bg-slate-100 text-center font-bold text-slate-600";
+                msgCost.innerText = "En Presupuesto";
+            }
+
+            // 4. Update DOM - TIME
+            const dispSV = document.getElementById('display-sv');
+            const dispSPI = document.getElementById('display-spi');
+            const cardTime = document.getElementById('card-time');
+            const msgTime = document.getElementById('msg-time');
+            const markerSPI = document.getElementById('marker-spi');
+
+            dispSV.innerText = `$${sv}`;
+            dispSPI.innerText = spiDisplay;
+
+            // Logic visual Time
+            let spiPercent = (spi / 2) * 100;
+            if(spiPercent > 100) spiPercent = 100;
+            if(spiPercent < 0) spiPercent = 0;
+            markerSPI.style.left = `${spiPercent}%`;
+
+            if (spi < 1) {
+                dispSPI.className = "text-5xl font-black text-red-600";
+                dispSV.className = "text-2xl font-bold text-red-600";
+                cardTime.className = "card-transition bg-white rounded-2xl shadow-lg p-6 border-l-8 border-red-500 relative overflow-hidden";
+                msgTime.className = "mt-6 p-3 rounded-lg bg-red-100 text-center font-bold text-red-700";
+                msgTime.innerHTML = "<i class='fas fa-history mr-2'></i> RETRASADO (Lento)";
+            } else if (spi > 1) {
+                dispSPI.className = "text-5xl font-black text-green-600";
+                dispSV.className = "text-2xl font-bold text-green-600";
+                cardTime.className = "card-transition bg-white rounded-2xl shadow-lg p-6 border-l-8 border-green-500 relative overflow-hidden";
+                msgTime.className = "mt-6 p-3 rounded-lg bg-green-100 text-center font-bold text-green-700";
+                msgTime.innerHTML = "<i class='fas fa-bolt mr-2'></i> ADELANTADO (Rápido)";
+            } else {
+                dispSPI.className = "text-5xl font-black text-slate-800";
+                dispSV.className = "text-2xl font-bold text-slate-800";
+                cardTime.className = "card-transition bg-white rounded-2xl shadow-lg p-6 border-l-8 border-slate-300 relative overflow-hidden";
+                msgTime.className = "mt-6 p-3 rounded-lg bg-slate-100 text-center font-bold text-slate-600";
+                msgTime.innerText = "En Cronograma";
+            }
+        }
+
+        // Init
+        updateDashboard();
+    </script>
+</body>
+</html>
