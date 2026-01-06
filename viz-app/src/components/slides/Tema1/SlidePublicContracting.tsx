@@ -1,5 +1,5 @@
 
-import SlideContainer from '../shared/SlideContainer';
+import SlideContainer from '../../shared/SlideContainer';
 
 const SlidePublicContracting = () => (
     <div className="animate-fade-in space-y-8">

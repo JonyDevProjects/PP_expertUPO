@@ -60,31 +60,48 @@ const SlideExecution = () => {
                     </div>
 
                     <div className="p-6 flex-1 flex flex-col justify-center">
-                        <div className="flex items-end justify-between h-40 gap-2 mb-2">
-                            {currentResourceData.map((hours, index) => {
-                                const isOverloaded = hours > 8;
-                                const heightPercent = (hours / 16) * 100; // 16h es el max visual
-                                return (
-                                    <div key={index} className="w-full flex flex-col justify-end items-center group">
-                                        <div className="text-xs font-bold mb-1 text-slate-500 dark:text-slate-400">{hours}h</div>
-                                        <div
-                                            className={`w-full rounded-t-md transition-all duration-500 relative ${isOverloaded ? 'bg-red-500' : 'bg-blue-500'}`}
-                                            style={{ height: `${heightPercent}%` }}
-                                        >
-                                            {isOverloaded && (
-                                                <div className="absolute top-1 left-1/2 -translate-x-1/2 text-white">
-                                                    <AlertTriangle className="w-4 h-4 animate-pulse" />
+                        {/* Graph Container */}
+                        <div className="relative h-48 mb-2 mt-4 select-none">
+                            {/* Global 8h Capacity Line Reference */}
+                            <div className="absolute inset-x-0 bottom-8 top-8 z-0">
+                                <div className="absolute bottom-[50%] w-full border-t border-dashed border-red-300 dark:border-red-500/50 flex justify-end">
+                                    <span className="text-[10px] text-red-500/80 bg-white/80 dark:bg-slate-800/80 px-1 -mt-2 backdrop-blur-sm">Max 8h</span>
+                                </div>
+                            </div>
+
+                            <div className="flex items-end justify-between h-full gap-2 relative z-10">
+                                {currentResourceData.map((hours, index) => {
+                                    const isOverloaded = hours > 8;
+                                    const maxScale = 16;
+                                    const heightPercent = Math.min((hours / maxScale) * 100, 100);
+
+                                    return (
+                                        <div key={index} className="w-full h-full flex flex-col justify-end items-center group">
+                                            {/* Value Label */}
+                                            <div className={`text-xs font-bold mb-1 transition-all ${isOverloaded ? 'text-red-500' : 'text-slate-500 dark:text-slate-400'}`}>
+                                                {hours}h
+                                            </div>
+
+                                            {/* Bar Track Area */}
+                                            <div className="w-full flex-1 relative bg-slate-100/50 dark:bg-slate-700/30 rounded-t-md">
+                                                <div
+                                                    className={`absolute bottom-0 w-full rounded-t-md transition-all duration-500 flex justify-center pt-1 ${isOverloaded ? 'bg-red-500 shadow-md shadow-red-500/20' : 'bg-blue-500'}`}
+                                                    style={{ height: `${heightPercent}%` }}
+                                                >
+                                                    {isOverloaded && (
+                                                        <AlertTriangle className="w-3.5 h-3.5 text-white/90 animate-pulse drop-shadow-sm" />
+                                                    )}
                                                 </div>
-                                            )}
-                                            {/* Línea de capacidad 8h */}
-                                            {heightPercent > 50 && (
-                                                <div className="absolute bottom-[50%] w-full h-0.5 bg-white/50 border-t border-dashed border-white/80" title="Capacidad Máx (8h)"></div>
-                                            )}
+                                            </div>
+
+                                            {/* X-Axis Label */}
+                                            <div className="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+                                                Día {index + 1}
+                                            </div>
                                         </div>
-                                        <div className="mt-2 text-xs text-slate-400">Día {index + 1}</div>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })}
+                            </div>
                         </div>
                         <div className="mt-4 text-sm text-center">
                             {isLeveled ? (

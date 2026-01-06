@@ -6,22 +6,24 @@ import {
     Users,
     Search,
     FileText,
-    TrendingUp
+    TrendingUp,
+    Award
 } from 'lucide-react';
 
 // --- Imports from Components ---
-import SlideDefinition from './components/slides/SlideDefinition';
-import SlideLifecycle from './components/slides/SlideLifecycle';
-import SlideTripleConstraint from './components/slides/SlideTripleConstraint';
-import SlideSuccessAndRoles from './components/slides/SlideSuccessAndRoles';
-import SlideOriginAndViability from './components/slides/SlideOriginAndViability';
-import SlidePublicContracting from './components/slides/SlidePublicContracting';
-import SlideManagementVsBusiness from './components/slides/SlideManagementVsBusiness';
+import SlideDefinition from './components/slides/Tema1/SlideDefinition';
+import SlideLifecycle from './components/slides/Tema1/SlideLifecycle';
+import SlideTripleConstraint from './components/slides/Tema1/SlideTripleConstraint';
+import SlideSuccessAndRoles from './components/slides/Tema1/SlideSuccessAndRoles';
+import SlideOriginAndViability from './components/slides/Tema1/SlideOriginAndViability';
+import SlidePublicContracting from './components/slides/Tema1/SlidePublicContracting';
+import SlideManagementVsBusiness from './components/slides/Tema1/SlideManagementVsBusiness';
 
 // --- Interfaces ---
 interface SlideItem {
     title: string;
     icon: React.ReactNode;
+    subtitle: string;
 }
 
 // --- Main Layout Component ---
@@ -30,13 +32,46 @@ const InfographicDeck = () => {
     const [activeTab, setActiveTab] = useState(0);
 
     const slides: SlideItem[] = [
-        { title: "1. Concepto de Proyecto", icon: <Briefcase className="w-5 h-5" /> },
-        { title: "2. Desarrollo de un Proyecto", icon: <Layers className="w-5 h-5" /> },
-        { title: "3. Gestión de Proyectos", icon: <Scale className="w-5 h-5" /> },
-        { title: "4. Roles & Skills del PM(fracaso y exito)", icon: <Users className="w-5 h-5" /> },
-        { title: "5. Origen y Viabilidad", icon: <Search className="w-5 h-5" /> },
-        { title: "6. Contratación Pública", icon: <FileText className="w-5 h-5" /> },
-        { title: "7. Gestión vs. Negocio", icon: <TrendingUp className="w-5 h-5" /> },
+        {
+            title: "1. Concepto",
+            icon: <Briefcase className="w-5 h-5" />,
+            subtitle: "Definición de Proyecto"
+        },
+        {
+            title: "2. Desarrollo",
+            icon: <Layers className="w-5 h-5" />,
+            subtitle: "Ciclo de Vida del Producto"
+        },
+        {
+            title: "3. La Gestión",
+            icon: <Scale className="w-5 h-5" />,
+            subtitle: "Funciones y Triple Restricción"
+        },
+        {
+            title: "4. Éxito/Fracaso",
+            icon: <TrendingUp className="w-5 h-5" />,
+            subtitle: "Factores Clave"
+        },
+        {
+            title: "5. El Director",
+            icon: <Users className="w-5 h-5" />,
+            subtitle: "Habilidades, Roles y Responsabilidades"
+        },
+        {
+            title: "6. Origen",
+            icon: <Search className="w-5 h-5" />,
+            subtitle: "¿Cómo surgen? Viabilidad"
+        },
+        {
+            title: "7. Contratación",
+            icon: <FileText className="w-5 h-5" />,
+            subtitle: "Sector Público"
+        },
+        {
+            title: "8. Gestión vs Negocio",
+            icon: <Award className="w-5 h-5" />,
+            subtitle: "Diferencias Clave"
+        }
     ];
 
     const renderContent = () => {
@@ -44,79 +79,64 @@ const InfographicDeck = () => {
             case 0: return <SlideDefinition />;
             case 1: return <SlideLifecycle />;
             case 2: return <SlideTripleConstraint />;
-            case 3: return <SlideSuccessAndRoles />;
-            case 4: return <SlideOriginAndViability />;
-            case 5: return <SlidePublicContracting />;
-            case 6: return <SlideManagementVsBusiness />;
+            case 3: return <SlideSuccessAndRoles />; // Éxito y Fracaso
+            case 4: return <SlideSuccessAndRoles />; // Director (Same component covers both)
+            case 5: return <SlideOriginAndViability />;
+            case 6: return <SlidePublicContracting />;
+            case 7: return <SlideManagementVsBusiness />;
             default: return null;
         }
     };
 
     return (
-        <div className="min-h-screen bg-background font-sans text-text-main flex flex-col transition-colors duration-300">
+        <div className="w-full max-w-7xl mx-auto space-y-8 pb-20">
             {/* Header */}
-            <header className="bg-primary text-white p-6 shadow-lg z-20 relative">
-                <div className="max-w-7xl mx-auto">
-                    <h1 className="text-3xl font-bold flex items-center gap-3">
-                        <Briefcase className="w-8 h-8 text-amber-400" />
-                        Tema 1: Fundamentos de Gestión de Proyectos
-                    </h1>
-                    <p className="mt-2 text-indigo-100">Visualización Estratégica basada en PMBOK® & Mejores Prácticas</p>
-                </div>
+            <header className="text-center space-y-4 mb-12">
+                <h1 className="text-3xl md:text-5xl font-extrabold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent flex items-center justify-center gap-3">
+                    Tema 1: Introducción
+                </h1>
+                <p className="text-lg text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
+                    Este tema establece los cimientos conceptuales de la Dirección de Proyectos, delimitando la naturaleza única y temporal de los <strong>proyectos frente a las operaciones continuas y la producción en masa.</strong> Se profundiza en la dicotomía entre el <strong>Ciclo de Vida del Producto (desarrollo técnico)</strong> y el <strong>Ciclo de Vida del Proyecto (gestión)</strong>, definiendo el <strong>rol crítico del Director de Proyecto</strong> y las competencias necesarias <strong>para equilibrar la Triple Restricción (Alcance, Tiempo y Coste)</strong>. Finalmente, se contextualiza el nacimiento de los proyectos desde la estrategia organizacional <strong>(Business Case)</strong> y se examinan los marcos normativos esenciales de la <strong>Contratación Pública (Suministros vs. Servicios)</strong> que rigen la ejecución en entornos administrativos.
+                </p>
             </header>
 
-            {/* Layout Container */}
-            <div className="flex-1 max-w-7xl mx-auto w-full flex flex-col md:flex-row gap-8 p-6">
-
-                {/* Navigation Sidebar */}
-                <aside className="w-full md:w-72 shrink-0">
-                    <nav
-                        className="bg-surface rounded-xl shadow-sm border border-border sticky top-6 overflow-hidden transition-colors duration-300"
-                        role="tablist"
-                        aria-label="Diapositivas de la infografía"
-                    >
-                        <div className="flex flex-col">
-                            {slides.map((slide, index) => {
-                                const isActive = activeTab === index;
-                                return (
-                                    <button
-                                        key={index}
-                                        role="tab"
-                                        aria-selected={isActive}
-                                        aria-controls={`panel-${index}`}
-                                        id={`tab-${index}`}
-                                        onClick={() => setActiveTab(index)}
-                                        className={`flex items-center gap-3 px-5 py-4 text-sm font-semibold transition-all border-l-4 text-left ${isActive
-                                            ? 'border-amber-500 text-primary bg-indigo-50 dark:bg-slate-800'
-                                            : 'border-transparent text-text-muted hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800'
-                                            }`}
-                                    >
-                                        <span className={`shrink-0 ${isActive ? 'text-amber-600' : 'text-slate-400 dark:text-slate-500'}`}>
-                                            {slide.icon}
-                                        </span>
-                                        {slide.title}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </nav>
-                </aside>
-
-                {/* Main Content Area */}
-                <main
-                    className="flex-1 min-w-0"
-                    role="tabpanel"
-                    id={`panel-${activeTab}`}
-                    aria-labelledby={`tab-${activeTab}`}
-                >
-                    {renderContent()}
-                </main>
+            {/* Navigation Tabs (Top Grid) */}
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3 relative z-100 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md p-3 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+                {slides.map((slide, index) => {
+                    const isActive = activeTab === index;
+                    return (
+                        <button
+                            key={index}
+                            onClick={() => setActiveTab(index)}
+                            className={`
+                                flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-300 border-2
+                                ${isActive
+                                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 transform scale-105 shadow-md'
+                                    : 'border-transparent hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400'
+                                }
+                            `}
+                        >
+                            <div className={`p-2 rounded-full ${isActive ? 'bg-indigo-100 dark:bg-indigo-800' : 'bg-slate-100 dark:bg-slate-800'}`}>
+                                {slide.icon}
+                            </div>
+                            <div className="text-center">
+                                <span className={`block font-bold text-sm ${isActive ? 'text-slate-800 dark:text-white' : ''}`}>
+                                    {slide.title}
+                                </span>
+                                <span className="text-xs opacity-75 hidden md:block leading-tight mt-1">
+                                    {slide.subtitle}
+                                </span>
+                            </div>
+                        </button>
+                    );
+                })}
             </div>
 
-            {/* Footer */}
-            <footer className="max-w-7xl mx-auto p-6 text-center text-text-muted text-sm">
-                <p>© PP_Expert - Material didáctico enriquecido basado en "Tema 1: Gestión de Proyectos"</p>
-            </footer>
+            {/* Main Content Area */}
+            <main className="min-h-[600px] animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {renderContent()}
+            </main>
+
         </div>
     );
 };

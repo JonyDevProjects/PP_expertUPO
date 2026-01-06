@@ -1,6 +1,6 @@
 
 import { Briefcase, CheckCircle, TrendingUp } from 'lucide-react';
-import SlideContainer from '../shared/SlideContainer';
+import SlideContainer from '../../shared/SlideContainer';
 
 const SlideManagementVsBusiness = () => (
     <div className="animate-fade-in space-y-8">

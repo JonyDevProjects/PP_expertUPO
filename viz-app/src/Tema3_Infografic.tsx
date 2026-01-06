@@ -26,43 +26,46 @@ const Tema3_Infografic = () => {
 
     const slides: SlideItem[] = [
         {
-            title: "1. Cronograma y Redes",
+            title: "1. Ejecución (Índice 1-5)",
+            icon: <PlayCircle className="w-5 h-5" />,
+            subtitle: "Procesos, Fases y Definiciones"
+        },
+        {
+            title: "2. Cronograma (Índice 6.4)",
             icon: <Network className="w-5 h-5" />,
-            subtitle: "Estimación, PDM, Ruta Crítica" // Modified subtitle
+            subtitle: "Estimación, Redes y Ruta Crítica"
         },
         {
-            title: "2. Ejecución y Control",
-            icon: <PlayCircle className="w-5 h-5" />, // Changed icon to PlayCircle
-            subtitle: "Calidad, RRHH y Cambios" // Modified subtitle
-        },
-        {
-            title: "3. Laboratorio EVM",
+            title: "3. Coste y Estado (Índice 6.5)",
             icon: <BarChart2 className="w-5 h-5" />,
-            subtitle: "Valor Ganado y Curva S" // Modified subtitle
+            subtitle: "EVM, Curva S y Pronósticos"
         },
+        {
+            title: "4. Control y Soporte (Índice 6.6-12)",
+            icon: <Activity className="w-5 h-5" />,
+            subtitle: "Cambios, Calidad y Riesgos"
+        }
     ];
 
     const renderContent = () => {
         switch (activeTab) {
-            case 0:
+            case 0: // Ejecución
                 return (
                     <div className="space-y-12">
-                        <SlideEstimation /> {/* Added SlideEstimation */}
+                        <SlideExecution />
+                    </div>
+                );
+            case 1: // Cronograma (6.4 Tiempo)
+                return (
+                    <div className="space-y-12">
+                        <SlideEstimation />
                         <div className="border-t-2 border-dashed border-slate-200 dark:border-slate-700" />
                         <SlideNetworkAnatomy />
                         <div className="border-t-2 border-dashed border-slate-200 dark:border-slate-700" />
                         <SlideCriticalPath />
                     </div>
                 );
-            case 1:
-                return (
-                    <div className="space-y-12">
-                        <SlideExecution />
-                        <div className="border-t-2 border-dashed border-slate-200 dark:border-slate-700" />
-                        <SlideControl />
-                    </div>
-                );
-            case 2:
+            case 2: // Coste y Estado (6.4 Coste + 6.5 EVM)
                 return (
                     <div className="space-y-12">
                         <SlideEVMSemaphore />
@@ -70,80 +73,65 @@ const Tema3_Infografic = () => {
                         <SlideSCurve />
                     </div>
                 );
-            default: return null;
+            case 3: // Control y Soporte
+                return (
+                    <div className="space-y-12">
+                        <SlideControl />
+                    </div>
+                );
+            default:
+                return null;
         }
     };
 
     return (
-        <div className="min-h-screen bg-background font-sans text-text-main flex flex-col transition-colors duration-300">
+        <div className="w-full max-w-6xl mx-auto space-y-8 pb-20">
             {/* Header */}
-            <header className="bg-gradient-to-r from-blue-900 to-indigo-800 text-white p-6 shadow-lg z-20 relative">
-                <div className="max-w-7xl mx-auto">
-                    <h1 className="text-3xl font-bold flex items-center gap-3">
-                        <Activity className="w-8 h-8 text-blue-300" />
-                        Tema 3: Ejecución, Monitorización y Control del Proyecto.
-                    </h1>
-                    <p className="mt-2 text-blue-100 opacity-90">
-                        Domina los diagramas de red, gestiona la ejecución y controla los costos con el Laboratorio EVM interactivo.
-                    </p>
-                </div>
+            <header className="text-center space-y-4 mb-12">
+                <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
+                    Tema 3: Ejecución, Monitorización y Control del Proyecto.
+                </h1>
+                <p className="text-lg text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
+                    Este tema aborda la fase de <strong>realización del trabajo</strong> y la <strong>vigilancia del desempeño</strong> del proyecto. Se analiza cómo transformar <strong>la planificación en entregables tangibles</strong> mediante la <em>coordinación de recursos, equipos y stakeholders</em>. Simultáneamente, se profundiza en los procesos de <strong>Monitorización y Control</strong> para medir la salud del proyecto utilizando técnicas avanzadas como el <strong>Método de la Ruta Crítica</strong> y la <strong>Gestión del Valor Ganado (EVM)</strong>, asegurando que las variaciones en la <strong>triple restricción (Alcance, Tiempo, Coste)</strong> se gestionen mediante un <strong>Control Integrado de Cambios</strong> formal.
+                </p>
             </header>
 
-            {/* Layout Container */}
-            <div className="flex-1 max-w-7xl mx-auto w-full flex flex-col md:flex-row gap-8 p-6">
-
-                {/* Navigation Sidebar */}
-                <aside className="w-full md:w-72 shrink-0">
-                    <nav
-                        className="bg-surface rounded-xl shadow-sm border border-border sticky top-6 overflow-hidden transition-colors duration-300"
-                        role="tablist"
-                        aria-label="Diapositivas de la infografía"
-                    >
-                        <div className="flex flex-col">
-                            {slides.map((slide, index) => {
-                                const isActive = activeTab === index;
-                                return (
-                                    <button
-                                        key={index}
-                                        role="tab"
-                                        aria-selected={isActive}
-                                        aria-controls={`panel - ${index} `}
-                                        id={`tab - ${index} `}
-                                        onClick={() => setActiveTab(index)}
-                                        className={`flex items - center gap - 3 px - 5 py - 4 text - sm transition - all border - l - 4 text - left ${isActive
-                                            ? 'border-blue-500 text-blue-700 bg-blue-50 dark:bg-slate-800 dark:text-blue-400'
-                                            : 'border-transparent text-text-muted hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800'
-                                            } `}
-                                    >
-                                        <span className={`shrink - 0 ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'} `}>
-                                            {slide.icon}
-                                        </span>
-                                        <div>
-                                            <span className="font-bold block">{slide.title}</span>
-                                            <span className="text-xs text-slate-500 dark:text-slate-400 font-normal">{slide.subtitle}</span>
-                                        </div>
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </nav>
-                </aside>
-
-                {/* Main Content Area */}
-                <main
-                    className="flex-1 min-w-0"
-                    role="tabpanel"
-                    id={`panel - ${activeTab} `}
-                    aria-labelledby={`tab - ${activeTab} `}
-                >
-                    {renderContent()}
-                </main>
+            {/* Navigation Tabs */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative z-100 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md p-2 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+                {slides.map((slide, index) => {
+                    const isActive = activeTab === index;
+                    return (
+                        <button
+                            key={index}
+                            onClick={() => setActiveTab(index)}
+                            className={`
+                                flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-300 border-2
+                                ${isActive
+                                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 transform scale-105 shadow-md'
+                                    : 'border-transparent hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400'
+                                }
+                            `}
+                        >
+                            <div className={`p-2 rounded-full ${isActive ? 'bg-blue-100 dark:bg-blue-800' : 'bg-slate-100 dark:bg-slate-800'}`}>
+                                {slide.icon}
+                            </div>
+                            <div className="text-center">
+                                <span className={`block font-bold text-sm ${isActive ? 'text-slate-800 dark:text-white' : ''}`}>
+                                    {slide.title}
+                                </span>
+                                <span className="text-xs opacity-75 hidden md:block">
+                                    {slide.subtitle}
+                                </span>
+                            </div>
+                        </button>
+                    );
+                })}
             </div>
 
-            {/* Footer */}
-            <footer className="max-w-7xl mx-auto p-6 text-center text-text-muted text-sm">
-                <p>© PP_Expert - Material Docente Interactivo - Basado en PMBOK® Guide</p>
-            </footer>
+            {/* Main Content Area */}
+            <main className="min-h-[600px] animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {renderContent()}
+            </main>
         </div>
     );
 };

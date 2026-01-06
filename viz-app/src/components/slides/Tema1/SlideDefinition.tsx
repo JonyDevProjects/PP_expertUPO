@@ -1,6 +1,6 @@
 
 import { Target, Clock, Users } from 'lucide-react';
-import SlideContainer from '../shared/SlideContainer';
+import SlideContainer from '../../shared/SlideContainer';
 
 const SlideDefinition = () => (
     <div className="animate-fade-in space-y-8">

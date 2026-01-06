@@ -1,6 +1,6 @@
 
 import { Users, CheckCircle, XCircle } from 'lucide-react';
-import SlideContainer from '../shared/SlideContainer';
+import SlideContainer from '../../shared/SlideContainer';
 
 const SlideSuccessAndRoles = () => (
     <div className="animate-fade-in space-y-8">

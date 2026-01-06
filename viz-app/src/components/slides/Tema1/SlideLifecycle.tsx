@@ -1,6 +1,6 @@
 
 import { Layers } from 'lucide-react';
-import SlideContainer from '../shared/SlideContainer';
+import SlideContainer from '../../shared/SlideContainer';
 
 const SlideLifecycle = () => (
     <div className="animate-fade-in space-y-8">
