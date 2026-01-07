@@ -1,0 +1,83 @@
+[
+    {
+        "id": "definition",
+        "text": "Un proyecto es un esfuerzo TEMPORAL emprendido para crear un producto, servicio o resultado ÚNICO."
+    },
+    {
+        "id": "characteristics",
+        "text": "Sus cuatro características son: Temporalidad (tiene inicio y fin), Unicidad (el entregable es único), Recursos Limitados (restricciones de dinero y tiempo) y Objetivos Claros, definidos mediante metas SMART."
+    },
+    {
+        "id": "comparison",
+        "text": "Diferencia entre Proyecto y Operaciones: El Proyecto es único (como una web personalizada), temporal (como por ejemplo, 6 meses) y con equipo dinámico. Las Operaciones son repetitivas (como una cadena de montaje), continuas (sin fin) y con equipo estático."
+    },
+    {
+        "id": "types",
+        "text": "Tipos de Organización: Producción en masa (busca economías de escala), Producción por lotes (sistemas flexibles que se adaptan) y Proyectos (tareas específicas y únicas)."
+    },
+    {
+        "id": "ui_definition",
+        "main_text": "\"Un esfuerzo <span className=\"text-amber-600 dark:text-amber-400 font-bold\">TEMPORAL</span> emprendido para crear un producto, servicio o resultado <span className=\"text-amber-600 dark:text-amber-400 font-bold\">ÚNICO</span>.\"",
+        "source": "- Definición PMBOK"
+    },
+    {
+        "id": "ui_characteristics",
+        "title": "Características:",
+        "items": [
+            {
+                "label": "Temporalidad:",
+                "text": "Tiene un inicio y un fin definidos."
+            },
+            {
+                "label": "Unicidad:",
+                "text": "El entregable es único."
+            },
+            {
+                "label": "Recursos Limitados:",
+                "text": "Restricciones de dinero y tiempo."
+            },
+            {
+                "label": "Objetivos Claros:",
+                "text": "Metas SMART definidas."
+            }
+        ]
+    },
+    {
+        "id": "ui_comparison",
+        "title": "Proyecto VS Operaciones",
+        "project": {
+            "title": "PROYECTO",
+            "items": [
+                "Único (Web personalizada)",
+                "Temporal (6 meses)",
+                "Equipo Dinámico"
+            ]
+        },
+        "operations": {
+            "title": "OPERACIONES",
+            "items": [
+                "Repetitivo (Cadena montaje)",
+                "Continuo (Sin fin)",
+                "Equipo Estático"
+            ]
+        }
+    },
+    {
+        "id": "ui_types",
+        "title": "Tipos de Organización del Trabajo:",
+        "items": [
+            {
+                "title": "Producción en masa",
+                "desc": "Ensamblar productos o servicios especializados buscando economías de escala."
+            },
+            {
+                "title": "Producción por lotes",
+                "desc": "Sistemas flexibles para productos similares donde la producción se adapta."
+            },
+            {
+                "title": "Proyectos",
+                "desc": "Productos o resultados que se realizan una sola vez con tareas específicas y únicas."
+            }
+        ]
+    }
+]

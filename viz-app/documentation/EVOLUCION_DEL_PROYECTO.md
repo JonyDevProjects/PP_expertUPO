@@ -90,3 +90,24 @@ Se migraron y adaptaron visualizaciones que antes residían en documentación al
 - **Optimización de Interacciones**: Refinar las micro-interacciones y animaciones para una experiencia más fluida.
 - **Cobertura de Pruebas**: Implementar tests unitarios para las utilidades críticas y tests E2E para los flujos principales.
 - **Accesibilidad**: Auditoría completa de contraste y navegación por teclado.
+
+## 6. Análisis del Estado Actual (Enero 2026)
+*Auditoría realizada bajo el workflow `/a-main-intregation`*
+
+### A. Salud del Código
+- **Puntos Fuertes**: 
+    - La arquitectura modular establecida está madura y permite la integración de nuevos temas (como se demostró con el Tema 2) sin fricción.
+    - El uso de **TypeScript** es consistente y evita errores de tipo comunes.
+    - La separación de `shared/SlideContainer` ha unificado la UX.
+- **Puntos de Dolor (Code Smells & Hotspots)**:
+    - **`SlideTripleConstraint.tsx` (Complejidad)**: Este componente actúa como un mini-monolito. Gestiona demasiados estados concurrentes (navegación de tabs, TTS activo, resaltado de funciones, fases de workflow, celdas de matriz). Debería refactorizarse extrayendo la lógica de estado a un Hook personalizado (`useTripleConstraintState`) o usando un Reducer.
+    - **Hardcoded Data**: Las cadenas de texto para la narración (arrays `steps`) y contenidos de diapositivas (como en `SlideDefinition`) están "quemados" dentro de los componentes. Esto viola el principio de separación de intereses (Contenido vs Presentación) y dificulta la internacionalización.
+
+### B. Deuda Técnica Crítica
+- **Ausencia Total de Tests**: No existe configuración de pruebas (`vitest` o `jest`) ni scripts en `package.json`. Cualquier refactorización actual es de alto riesgo ("High Wire Walk").
+- **Acoplamiento de Datos**: Visualizaciones complejas dependen de la estructura exacta de datos en `src/data`. Se recomienda validar estos datos con esquemas (ej. Zod) al consumirlos.
+
+### C. Hoja de Ruta Recomendada (Next Steps)
+1.  **Prioridad 0 (Seguridad)**: Instalar `Vitest` y crear el primer test de humo ("Smoke Test") para asegurar que la App renderiza.
+2.  **Prioridad 1 (Limpieza)**: Extraer todos los textos "hardcoded" de `Search`, `Definition` y `TripleConstraint` a archivos JSON en `src/data/locales/`.
+3.  **Prioridad 2 (Escalabilidad)**: Refactorizar `SlideTripleConstraint` para desacoplar la máquina de estados de la vista.

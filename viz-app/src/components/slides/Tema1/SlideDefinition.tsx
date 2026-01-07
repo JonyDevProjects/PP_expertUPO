@@ -1,25 +1,7 @@
 import { useState } from 'react';
 import { Target, Clock, Users, BookOpen } from 'lucide-react';
 import SlideContainer from '../../shared/SlideContainer';
-
-const steps = [
-    {
-        id: 'definition',
-        text: "Un proyecto es un esfuerzo TEMPORAL emprendido para crear un producto, servicio o resultado ÚNICO."
-    },
-    {
-        id: 'characteristics',
-        text: "Sus cuatro características son: Temporalidad (tiene inicio y fin), Unicidad (el entregable es único), Recursos Limitados (restricciones de dinero y tiempo) y Objetivos Claros, definidos mediante metas SMART."
-    },
-    {
-        id: 'comparison',
-        text: "Diferencia entre Proyecto y Operaciones: El Proyecto es único (como una web personalizada), temporal (como por ejemplo, 6 meses) y con equipo dinámico. Las Operaciones son repetitivas (como una cadena de montaje), continuas (sin fin) y con equipo estático."
-    },
-    {
-        id: 'types',
-        text: "Tipos de Organización: Producción en masa (busca economías de escala), Producción por lotes (sistemas flexibles que se adaptan) y Proyectos (tareas específicas y únicas)."
-    }
-];
+import definitionData from '../../../data/locales/Tema1/definition.json';
 
 const SlideDefinition = ({ autoPlay }: { autoPlay?: boolean }) => {
     const [activeStep, setActiveStep] = useState<string | null>(null);
@@ -32,12 +14,25 @@ const SlideDefinition = ({ autoPlay }: { autoPlay?: boolean }) => {
             : "transition-all duration-500 opacity-20 blur-[1px] grayscale"; // Dimmed
     };
 
+    // Extract UI data helper
+    const getUIData = (id: string) => definitionData.find((item: any) => item.id === id) as any;
+    const uiDefinition = getUIData('ui_definition');
+    const uiCharacteristics = getUIData('ui_characteristics');
+    const uiComparison = getUIData('ui_comparison');
+    const uiTypes = getUIData('ui_types');
+
+    // Filter only steps for TTS (items with 'text' property directly)
+    const ttsSteps = definitionData.filter((item: any) => 'text' in item && !item.id.startsWith('ui_')).map((item: any) => ({
+        id: item.id,
+        text: (item as any).text
+    }));
+
     return (
         <div className="animate-fade-in space-y-8">
             <SlideContainer
                 title="¿Qué es un Proyecto?"
                 rate={1.2}
-                ttsSteps={steps}
+                ttsSteps={ttsSteps}
                 onStepChange={setActiveStep}
                 autoPlay={autoPlay}
             >
@@ -55,49 +50,43 @@ const SlideDefinition = ({ autoPlay }: { autoPlay?: boolean }) => {
                         {/* Left: Definition & Characteristics */}
                         <div className="space-y-6">
                             <div className={`bg-indigo-50 dark:bg-indigo-900/20 p-6 rounded-lg ${getFocusClass('definition')}`}>
-                                <p className="text-xl font-medium text-primary dark:text-indigo-300">
-                                    "Un esfuerzo <span className="text-amber-600 dark:text-amber-400 font-bold">TEMPORAL</span> emprendido para crear un producto, servicio o resultado <span className="text-amber-600 dark:text-amber-400 font-bold">ÚNICO</span>."
+                                <p className="text-xl font-medium text-primary dark:text-indigo-300"
+                                    dangerouslySetInnerHTML={{ __html: uiDefinition.main_text.replace(/className/g, 'class') }} // Quick fix for JSON className
+                                >
                                 </p>
-                                <p className="text-sm text-indigo-400 mt-2 text-right">- Definición PMBOK</p>
+                                <p className="text-sm text-indigo-400 mt-2 text-right">{uiDefinition.source}</p>
                             </div>
                             <div className={getFocusClass('characteristics')}>
-                                <h3 className="font-bold text-text-main mb-3">Características:</h3>
+                                <h3 className="font-bold text-text-main mb-3">{uiCharacteristics.title}</h3>
                                 <ul className="space-y-3">
-                                    <li className="flex items-center gap-3 bg-surface border border-border p-3 rounded shadow-sm">
-                                        <Clock className="text-blue-500" />
-                                        <span className="text-text-main"><strong>Temporalidad:</strong> Tiene un inicio y un fin definidos.</span>
-                                    </li>
-                                    <li className="flex items-center gap-3 bg-surface border border-border p-3 rounded shadow-sm">
-                                        <Target className="text-amber-500" />
-                                        <span className="text-text-main"><strong>Unicidad:</strong> El entregable es único.</span>
-                                    </li>
-                                    <li className="flex items-center gap-3 bg-surface border border-border p-3 rounded shadow-sm">
-                                        <Users className="text-green-500" />
-                                        <span className="text-text-main"><strong>Recursos Limitados:</strong> Restricciones de dinero y tiempo.</span>
-                                    </li>
-                                    <li className="flex items-center gap-3 bg-surface border border-border p-3 rounded shadow-sm">
-                                        <Target className="text-red-500" />
-                                        <span className="text-text-main"><strong>Objetivos Claros:</strong> Metas SMART definidas.</span>
-                                    </li>
+                                    {uiCharacteristics.items.map((item: any, idx: number) => (
+                                        <li key={idx} className="flex items-center gap-3 bg-surface border border-border p-3 rounded shadow-sm">
+                                            {idx === 0 && <Clock className="text-blue-500" />}
+                                            {idx === 1 && <Target className="text-amber-500" />}
+                                            {idx === 2 && <Users className="text-green-500" />}
+                                            {idx === 3 && <Target className="text-red-500" />}
+                                            <span className="text-text-main"><strong>{item.label}</strong> {item.text}</span>
+                                        </li>
+                                    ))}
                                 </ul>
                             </div>
                         </div>
 
                         {/* Right: Comparison Card */}
                         <div className={`bg-surface dark:bg-slate-800 text-text-main dark:text-white p-6 rounded-xl w-full border border-border shadow-sm transition-colors duration-300 h-full ${getFocusClass('comparison')}`}>
-                            <h3 className="text-lg font-bold text-primary dark:text-amber-400 mb-4 border-b border-border dark:border-slate-600 pb-2">Proyecto VS Operaciones</h3>
+                            <h3 className="text-lg font-bold text-primary dark:text-amber-400 mb-4 border-b border-border dark:border-slate-600 pb-2">{uiComparison.title}</h3>
                             <div className="grid grid-cols-2 gap-4 text-sm h-fit">
                                 <div className="space-y-2">
-                                    <p className="font-bold text-primary dark:text-indigo-300">PROYECTO</p>
-                                    <div className="bg-background dark:bg-slate-700 p-2 rounded border border-border dark:border-slate-600 shadow-sm transition-colors duration-300">Único (Web personalizada)</div>
-                                    <div className="bg-background dark:bg-slate-700 p-2 rounded border border-border dark:border-slate-600 shadow-sm transition-colors duration-300">Temporal (6 meses)</div>
-                                    <div className="bg-background dark:bg-slate-700 p-2 rounded border border-border dark:border-slate-600 shadow-sm transition-colors duration-300">Equipo Dinámico</div>
+                                    <p className="font-bold text-primary dark:text-indigo-300">{uiComparison.project.title}</p>
+                                    {uiComparison.project.items.map((item: string, idx: number) => (
+                                        <div key={idx} className="bg-background dark:bg-slate-700 p-2 rounded border border-border dark:border-slate-600 shadow-sm transition-colors duration-300">{item}</div>
+                                    ))}
                                 </div>
                                 <div className="space-y-2">
-                                    <p className="font-bold text-primary dark:text-indigo-300">OPERACIONES</p>
-                                    <div className="bg-background dark:bg-slate-700 p-2 rounded border border-border dark:border-slate-600 shadow-sm transition-colors duration-300">Repetitivo (Cadena montaje)</div>
-                                    <div className="bg-background dark:bg-slate-700 p-2 rounded border border-border dark:border-slate-600 shadow-sm transition-colors duration-300">Continuo (Sin fin)</div>
-                                    <div className="bg-background dark:bg-slate-700 p-2 rounded border border-border dark:border-slate-600 shadow-sm transition-colors duration-300">Equipo Estático</div>
+                                    <p className="font-bold text-primary dark:text-indigo-300">{uiComparison.operations.title}</p>
+                                    {uiComparison.operations.items.map((item: string, idx: number) => (
+                                        <div key={idx} className="bg-background dark:bg-slate-700 p-2 rounded border border-border dark:border-slate-600 shadow-sm transition-colors duration-300">{item}</div>
+                                    ))}
                                 </div>
                             </div>
                         </div>
@@ -105,20 +94,14 @@ const SlideDefinition = ({ autoPlay }: { autoPlay?: boolean }) => {
 
                     {/* Bottom Section: Organization Types */}
                     <div className={getFocusClass('types')}>
-                        <h3 className="font-bold text-text-main mb-4">Tipos de Organización del Trabajo:</h3>
+                        <h3 className="font-bold text-text-main mb-4">{uiTypes.title}</h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="p-4 bg-background rounded-lg border border-border hover:shadow-md transition-shadow">
-                                <h4 className="font-bold text-text-main mb-2">Producción en masa</h4>
-                                <p className="text-sm text-text-muted">Ensamblar productos o servicios especializados buscando economías de escala.</p>
-                            </div>
-                            <div className="p-4 bg-background rounded-lg border border-border hover:shadow-md transition-shadow">
-                                <h4 className="font-bold text-text-main mb-2">Producción por lotes</h4>
-                                <p className="text-sm text-text-muted">Sistemas flexibles para productos similares donde la producción se adapta.</p>
-                            </div>
-                            <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-100 dark:border-indigo-800 border-l-4 border-l-primary shadow-sm hover:shadow-md transition-shadow">
-                                <h4 className="font-bold text-primary">Proyectos</h4>
-                                <p className="text-sm text-primary dark:text-indigo-300">Productos o resultados que se realizan una sola vez con tareas específicas y únicas.</p>
-                            </div>
+                            {uiTypes.items.map((item: any, idx: number) => (
+                                <div key={idx} className={`p-4 rounded-lg border shadow-sm hover:shadow-md transition-shadow ${idx === 2 ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-100 dark:border-indigo-800 border-l-4 border-l-primary' : 'bg-background border-border'}`}>
+                                    <h4 className={`font-bold mb-2 ${idx === 2 ? 'text-primary' : 'text-text-main'}`}>{item.title}</h4>
+                                    <p className={`text-sm ${idx === 2 ? 'text-primary dark:text-indigo-300' : 'text-text-muted'}`}>{item.desc}</p>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -126,5 +109,6 @@ const SlideDefinition = ({ autoPlay }: { autoPlay?: boolean }) => {
         </div >
     );
 };
+
 
 export default SlideDefinition;

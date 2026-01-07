@@ -1,0 +1,57 @@
+[
+    {
+        "id": "origins",
+        "text": "Los proyectos nacen de necesidades concretas: oportunidades de mercado, problemas técnicos, nuevos objetivos estratégicos o requisitos legales."
+    },
+    {
+        "id": "analysis",
+        "text": "Pero antes de aprobar nada, debemos analizar su viabilidad mediante el Business Case."
+    },
+    {
+        "id": "balance",
+        "text": "Es una balanza: comparamos los costes y riesgos estimados contra los beneficios tangibles e intangibles que esperamos obtener."
+    },
+    {
+        "id": "financials",
+        "text": "Para justificar la inversión, usamos métricas financieras clave como el ROI (Retorno de Inversión) o el VAN (Valor Actual Neto)."
+    },
+    {
+        "id": "ui_origins",
+        "title": "¿De dónde nacen?",
+        "items": [
+            "Oportunidades de Negocio",
+            "Problemas (Tecnología obsoleta)",
+            "Objetivos Estratégicos",
+            "Requisitos Legales"
+        ]
+    },
+    {
+        "id": "ui_analysis",
+        "title": "Análisis de Viabilidad (Business Case)",
+        "desc": "Antes de autorizar el proyecto (Project Charter), debemos ponerlo en la balanza:"
+    },
+    {
+        "id": "ui_balance",
+        "costs": {
+            "title": "COSTES",
+            "items": [
+                "Económicos",
+                "Recursos",
+                "Riesgos"
+            ]
+        },
+        "benefits": {
+            "title": "BENEFICIOS",
+            "items": [
+                "Ingresos (Cuantitativo)",
+                "Imagen de Marca (Cualitativo)",
+                "Posicionamiento"
+            ]
+        }
+    },
+    {
+        "id": "ui_financials",
+        "tip": "Tip Pro:",
+        "text": "Usa herramientas financieras como ROI (Retorno de Inversión) y VAN (Valor Actual Neto) para justificar la decisión."
+    }
+]

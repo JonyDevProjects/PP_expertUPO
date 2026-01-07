@@ -1,0 +1,132 @@
+[
+    {
+        "id": "intro",
+        "text": "La gestión de proyectos difiere de las operaciones. Es el arte de equilibrar restricciones para alcanzar un objetivo único."
+    },
+    {
+        "id": "functions-intro",
+        "text": "Sus funciones principales son cuatro. Empezamos con..."
+    },
+    {
+        "id": "functions-plan",
+        "text": "Planificar: Definir la estrategia y el camino a seguir."
+    },
+    {
+        "id": "functions-org",
+        "text": "Organizar: Asignar los recursos y las personas adecuadas."
+    },
+    {
+        "id": "functions-lead",
+        "text": "Dirigir: Liderar e inspirar al equipo hacia la meta."
+    },
+    {
+        "id": "functions-ctrl",
+        "text": "Controlar: Medir el desempeño y corregir el rumbo."
+    },
+    {
+        "id": "restrictions-intro",
+        "text": "Todo gira en torno a la Triple Restricción. Es un equilibrio delicado."
+    },
+    {
+        "id": "restrictions-scope",
+        "text": "El Alcance: Todo el trabajo que debemos realizar."
+    },
+    {
+        "id": "restrictions-time",
+        "text": "El Tiempo: El cronograma que debemos cumplir."
+    },
+    {
+        "id": "restrictions-cost",
+        "text": "El Coste: El presupuesto que no podemos superar."
+    },
+    {
+        "id": "restrictions-quality",
+        "text": "Si alteras uno de estos lados, inevitablemente afectas a la Calidad. Es un 'trade-off' constante."
+    },
+    {
+        "id": "workflow-intro",
+        "text": "El trabajo fluye a través de Grupos de Procesos. No es lineal, es orgánico."
+    },
+    {
+        "id": "workflow-init",
+        "text": "Iniciación: Donde nace el proyecto."
+    },
+    {
+        "id": "workflow-plan",
+        "text": "Planificación: Donde trazamos el mapa."
+    },
+    {
+        "id": "workflow-exec",
+        "text": "Ejecución: Donde se realiza el trabajo pesado."
+    },
+    {
+        "id": "workflow-ctrl",
+        "text": "Control: El ojo vigilante que todo lo supervisa."
+    },
+    {
+        "id": "workflow-close",
+        "text": "Cierre: La entrega final y las lecciones aprendidas."
+    },
+    {
+        "id": "curves-intro",
+        "text": "El esfuerzo no es constante. Las curvas de actividad nos muestran la realidad."
+    },
+    {
+        "id": "curves-exec",
+        "text": "La Ejecución es la fase que más recursos y energía consume."
+    },
+    {
+        "id": "curves-monitor",
+        "text": "Mientras que el Monitoreo y Control es una constante durante toda la vida del proyecto."
+    },
+    {
+        "id": "areas-intro",
+        "text": "El PMBOK define Áreas de Conocimiento que debemos dominar transversalmente."
+    },
+    {
+        "id": "matrix-intro",
+        "text": "Finalmente, la Matriz de Procesos es nuestro mapa completo."
+    },
+    {
+        "id": "matrix-example",
+        "text": "Cruza el 'Qué' (Áreas) con el 'Cuándo' (Grupos) para decirnos exactamente qué hacer en cada paso."
+    },
+    {
+        "id": "ui_header",
+        "title": "Gestión de Proyectos",
+        "subtitle_prefix": "Organizar trabajo para objetivo",
+        "subtitle_highlight_1": "único",
+        "subtitle_connector": "y",
+        "subtitle_highlight_2": "temporal",
+        "subtitle_suffix": "."
+    },
+    {
+        "id": "ui_tabs",
+        "items": [
+            {
+                "id": "functions",
+                "label": "Gestión"
+            },
+            {
+                "id": "restrictions",
+                "label": "Triple R."
+            },
+            {
+                "id": "workflow",
+                "label": "Workflow"
+            },
+            {
+                "id": "curves",
+                "label": "Curvas"
+            },
+            {
+                "id": "areas",
+                "label": "Áreas"
+            },
+            {
+                "id": "matrix",
+                "label": "Matriz"
+            }
+        ]
+    }
+]
