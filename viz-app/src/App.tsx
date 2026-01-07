@@ -3,11 +3,12 @@ import Tema1_Infografic from './Tema1_Infografic'
 import Tema2_Infografic from './Tema2_Infografic'
 import Tema3_Infografic from './Tema3_Infografic'
 import Tema4_Infografic from './Tema4_Infografic'
+import Tema5_Infografic from './Tema5_Infografic'
 import { ThemeProvider } from './context/ThemeContext'
 import { ThemeToggle } from './components/ui/ThemeToggle'
 
 function App() {
-  const [activeTheme, setActiveTheme] = useState<'tema1' | 'tema2' | 'tema3' | 'tema4'>('tema1');
+  const [activeTheme, setActiveTheme] = useState<'tema1' | 'tema2' | 'tema3' | 'tema4' | 'tema5'>('tema1');
 
   return (
     <ThemeProvider>
@@ -38,6 +39,12 @@ function App() {
             >
               Tema 4
             </button>
+            <button
+              onClick={() => setActiveTheme('tema5')}
+              className={`px-4 py-1.5 rounded-full transition-all ${activeTheme === 'tema5' ? 'bg-white dark:bg-slate-700 text-purple-600 shadow-sm font-bold' : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-300'}`}
+            >
+              Tema 5
+            </button>
           </div>
           <ThemeToggle />
         </nav>
@@ -46,6 +53,7 @@ function App() {
         {activeTheme === 'tema2' && <Tema2_Infografic />}
         {activeTheme === 'tema3' && <Tema3_Infografic />}
         {activeTheme === 'tema4' && <Tema4_Infografic />}
+        {activeTheme === 'tema5' && <Tema5_Infografic />}
       </div>
     </ThemeProvider>
   )
