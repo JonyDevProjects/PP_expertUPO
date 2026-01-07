@@ -82,6 +82,29 @@ Son las "piezas" que el gestor debe coordinar simultáneamente:
 *   **Adquisiciones:** Compras externas.
 *   **Interesados:** Stakeholders.
 
+### 3.5. Mapa de Procesos (Matriz de Conocimiento)
+La interacción entre los Grupos de Procesos y las Áreas de Conocimiento define qué se hace en cada momento. Algunos cruces clave son:
+
+| Área / Grupo | Iniciación | Planificación | Ejecución | Control | Cierre |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Integración** | Desarrollar Acta de Constitución | Desarrollar Plan de Proyecto | Dirigir el Trabajo | Monitorear y Controlar Cambios | Cerrar Proyecto |
+| **Alcance** | - | Recopilar Requisitos, EDT | - | Validar y Controlar Alcance | - |
+| **Tiempo** | - | Definir Actividades, Cronograma | - | Controlar Cronograma | - |
+| **Coste** | - | Estimar Costos, Presupuesto | - | Controlar Costos (EVM) | - |
+| **Calidad** | - | Planificar Calidad | Aseguramiento (QA) | Control Calidad (QC) | - |
+| **R.R.H.H** | - | Planificar RRHH | Adquirir, Desarrollar y Dirigir Equipo | - | - |
+| **Comunicaciones** | - | Planificar Comunicaciones | Gestionar Comunicaciones | Controlar Comunicaciones | - |
+| **Riesgos** | - | Identificar, Analizar y Planificar Respuesta | - | Controlar Riesgos | - |
+| **Adquisiciones** | - | Planificar Adquisiciones | Efectuar Adquisiciones | Controlar Adquisiciones | Cerrar Adquisiciones |
+| **Interesados** | Identificar Interesados | Planificar Gestión | Gestionar Participación | Controlar Participación | - |
+
+### 3.6. Distribución del Esfuerzo (Curvas de Actividad)
+El esfuerzo no es lineal durante la vida del proyecto:
+*   **Fase de Planificación:** Consume recursos moderados pero crecientes.
+*   **Fase de Ejecución:** Es el pico máximo de consumo de recursos y costes.
+*   **Fase de Monitoreo:** Es constante y paralela a todas las fases.
+*   **Fase de Cierre:** Muestra un esfuerzo final específico para la entrega y lecciones aprendidas.
+
 ## 4. Éxito y Fracaso en proyectos
 El resultado no es accidental; depende de factores específicos de gestión y entorno.
 *   **Causas de Fracaso:** Planificación inadecuada, requisitos poco claros, o falta de apoyo de la dirección.
@@ -133,16 +156,13 @@ Cuando el cliente es la Administración Pública, la gestión de adquisiciones s
     *   Puede ser **Abierto** (cualquiera se presenta) o **Restringido** (solo invitados).
 
 
-## 8. Procesos de Gestión vs. Procesos de Negocio (Página 8)
+## 8. Procesos de Gestión vs. Procesos de Negocio
 Finalmente, una distinción importante para no perder el norte.
 
 *   **Procesos de Gestión:** Son internos, buscan eficiencia y administrar la organización (ej. RRHH, Finanzas).
 *   **Procesos de Negocio:** Son externos, buscan generar valor directo al cliente (ej. Ventas, Producción).
 
 ---
-
-> **Para reflexionar juntos:**
-> Basándonos en la "Triple Restricción" de la página 3 (Bueno, Bonito, Barato), imagina que tu jefe te pide reducir el tiempo de entrega de un proyecto a la mitad sin aumentar el presupuesto. Según este modelo, **¿qué elemento del triángulo se vería inevitablemente afectado?**
 
 ### 9. Guía Visual para Infografías
 

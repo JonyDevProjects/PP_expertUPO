@@ -30,6 +30,7 @@ interface SlideItem {
 
 const InfographicDeck = () => {
     const [activeTab, setActiveTab] = useState(0);
+    const [autoPlayEnabled, setAutoPlayEnabled] = useState(false);
 
     const slides: SlideItem[] = [
         {
@@ -75,15 +76,18 @@ const InfographicDeck = () => {
     ];
 
     const renderContent = () => {
+        // Pass autoPlay prop to all slides
+        const props = { autoPlay: autoPlayEnabled };
+
         switch (activeTab) {
-            case 0: return <SlideDefinition />;
-            case 1: return <SlideLifecycle />;
-            case 2: return <SlideTripleConstraint />;
-            case 3: return <SlideSuccessAndRoles />; // Éxito y Fracaso
-            case 4: return <SlideSuccessAndRoles />; // Director (Same component covers both)
-            case 5: return <SlideOriginAndViability />;
-            case 6: return <SlidePublicContracting />;
-            case 7: return <SlideManagementVsBusiness />;
+            case 0: return <SlideDefinition {...props} />;
+            case 1: return <SlideLifecycle {...props} />;
+            case 2: return <SlideTripleConstraint {...props} />;
+            case 3: return <SlideSuccessAndRoles {...props} />; // Éxito y Fracaso
+            case 4: return <SlideSuccessAndRoles {...props} />; // Director
+            case 5: return <SlideOriginAndViability {...props} />;
+            case 6: return <SlidePublicContracting {...props} />;
+            case 7: return <SlideManagementVsBusiness {...props} />;
             default: return null;
         }
     };
@@ -92,9 +96,28 @@ const InfographicDeck = () => {
         <div className="w-full max-w-7xl mx-auto space-y-8 pb-20">
             {/* Header */}
             <header className="text-center space-y-4 mb-12">
-                <h1 className="text-3xl md:text-5xl font-extrabold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent flex items-center justify-center gap-3">
-                    Tema 1: Introducción
-                </h1>
+                <div className="flex flex-col md:flex-row justify-between items-center relative">
+                    <div className="flex-1"></div> {/* Spacer */}
+                    <h1 className="text-3xl md:text-5xl font-extrabold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent flex items-center justify-center gap-3">
+                        Tema 1: Introducción
+                    </h1>
+                    {/* Auto-play Toggle */}
+                    <div className="flex-1 flex justify-end mt-4 md:mt-0 w-full md:w-auto">
+                        <button
+                            onClick={() => setAutoPlayEnabled(!autoPlayEnabled)}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all shadow-sm ${autoPlayEnabled
+                                ? 'bg-indigo-600 text-white border-indigo-600 ring-2 ring-indigo-200'
+                                : 'bg-white dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700 hover:bg-slate-50'
+                                }`}
+                        >
+                            <span className={`w-2 h-2 rounded-full ${autoPlayEnabled ? 'bg-white animate-pulse' : 'bg-slate-300'}`}></span>
+                            <span className="text-xs font-bold uppercase tracking-wider">
+                                {autoPlayEnabled ? 'Modo Lectura: ON' : 'Modo Lectura: OFF'}
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
                 <p className="text-lg text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
                     Este tema establece los cimientos conceptuales de la Dirección de Proyectos, delimitando la naturaleza única y temporal de los <strong>proyectos frente a las operaciones continuas y la producción en masa.</strong> Se profundiza en la dicotomía entre el <strong>Ciclo de Vida del Producto (desarrollo técnico)</strong> y el <strong>Ciclo de Vida del Proyecto (gestión)</strong>, definiendo el <strong>rol crítico del Director de Proyecto</strong> y las competencias necesarias <strong>para equilibrar la Triple Restricción (Alcance, Tiempo y Coste)</strong>. Finalmente, se contextualiza el nacimiento de los proyectos desde la estrategia organizacional <strong>(Business Case)</strong> y se examinan los marcos normativos esenciales de la <strong>Contratación Pública (Suministros vs. Servicios)</strong> que rigen la ejecución en entornos administrativos.
                 </p>

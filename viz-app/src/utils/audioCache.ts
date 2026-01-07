@@ -1,4 +1,4 @@
-export const CACHE_NAME = 'TTS_CACHE_V1';
+export const CACHE_NAME = 'TTS_CACHE_V2';
 export const STORE_NAME = 'audio_store';
 
 const openDB = (): Promise<IDBDatabase> => {

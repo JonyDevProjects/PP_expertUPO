@@ -1,23 +1,46 @@
-
+import { useState } from 'react';
 import { Target, Clock, Users, BookOpen } from 'lucide-react';
 import SlideContainer from '../../shared/SlideContainer';
 
-const SlideDefinition = () => {
-    // Texto completo para la IA
-    const fullLessonText = `
-    Tema 1: Concepto de proyecto.
-    Un proyecto es un esfuerzo temporal que se lleva a cabo para crear un producto, servicio o resultado único.
-    Sus características principales son:
-    Uno. Temporalidad: Tiene un inicio y un final definidos.
-    Dos. Unicidad: El entregable final es diferente a otros anteriores.
-    Tres. Recursos Limitados: Opera bajo restricciones de dinero, personas y tiempo.
-    Cuatro. Claridad: Requiere objetivos claros.
-    Es importante distinguir entre Producción en masa, que busca economías de escala como fabricar coches, y Proyectos, que son resultados únicos.
-  `;
+const steps = [
+    {
+        id: 'definition',
+        text: "Un proyecto es un esfuerzo TEMPORAL emprendido para crear un producto, servicio o resultado ÚNICO."
+    },
+    {
+        id: 'characteristics',
+        text: "Sus cuatro características son: Temporalidad (tiene inicio y fin), Unicidad (el entregable es único), Recursos Limitados (restricciones de dinero y tiempo) y Objetivos Claros, definidos mediante metas SMART."
+    },
+    {
+        id: 'comparison',
+        text: "Diferencia entre Proyecto y Operaciones: El Proyecto es único (como una web personalizada), temporal (como por ejemplo, 6 meses) y con equipo dinámico. Las Operaciones son repetitivas (como una cadena de montaje), continuas (sin fin) y con equipo estático."
+    },
+    {
+        id: 'types',
+        text: "Tipos de Organización: Producción en masa (busca economías de escala), Producción por lotes (sistemas flexibles que se adaptan) y Proyectos (tareas específicas y únicas)."
+    }
+];
+
+const SlideDefinition = ({ autoPlay }: { autoPlay?: boolean }) => {
+    const [activeStep, setActiveStep] = useState<string | null>(null);
+
+    // Helper class for focus mode
+    const getFocusClass = (stepId: string) => {
+        if (!activeStep) return "transition-all duration-500 opacity-100"; // Normal state
+        return activeStep === stepId
+            ? "transition-all duration-500 opacity-100 scale-[1.02] ring-4 ring-amber-400/50 rounded-xl shadow-xl z-20 bg-surface" // Active Highlight
+            : "transition-all duration-500 opacity-20 blur-[1px] grayscale"; // Dimmed
+    };
 
     return (
         <div className="animate-fade-in space-y-8">
-            <SlideContainer title="¿Qué es un Proyecto?" ttsText={fullLessonText}>
+            <SlideContainer
+                title="¿Qué es un Proyecto?"
+                rate={1.2}
+                ttsSteps={steps}
+                onStepChange={setActiveStep}
+                autoPlay={autoPlay}
+            >
                 <div className="flex flex-col gap-8 h-full">
 
                     {/* Barra de herramientas superior de la diapositiva */}
@@ -28,37 +51,40 @@ const SlideDefinition = () => {
                         </div>
                     </div>
 
-                    {/* Top Section: Definition & Comparison */}
                     <div className="grid xl:grid-cols-2 gap-8 items-start">
                         {/* Left: Definition & Characteristics */}
                         <div className="space-y-6">
-                            <div className="bg-indigo-50 dark:bg-indigo-900/20 p-6 rounded-lg">
+                            <div className={`bg-indigo-50 dark:bg-indigo-900/20 p-6 rounded-lg ${getFocusClass('definition')}`}>
                                 <p className="text-xl font-medium text-primary dark:text-indigo-300">
                                     "Un esfuerzo <span className="text-amber-600 dark:text-amber-400 font-bold">TEMPORAL</span> emprendido para crear un producto, servicio o resultado <span className="text-amber-600 dark:text-amber-400 font-bold">ÚNICO</span>."
                                 </p>
                                 <p className="text-sm text-indigo-400 mt-2 text-right">- Definición PMBOK</p>
                             </div>
-                            <div>
+                            <div className={getFocusClass('characteristics')}>
                                 <h3 className="font-bold text-text-main mb-3">Características:</h3>
                                 <ul className="space-y-3">
-                                    <li className="flex items-center gap-3 bg-surface border border-border p-3 rounded shadow-sm">
-                                        <Target className="text-red-500" />
-                                        <span className="text-text-main"><strong>Objetivos Claros:</strong> Metas SMART definidas.</span>
-                                    </li>
                                     <li className="flex items-center gap-3 bg-surface border border-border p-3 rounded shadow-sm">
                                         <Clock className="text-blue-500" />
                                         <span className="text-text-main"><strong>Temporalidad:</strong> Tiene un inicio y un fin definidos.</span>
                                     </li>
                                     <li className="flex items-center gap-3 bg-surface border border-border p-3 rounded shadow-sm">
+                                        <Target className="text-amber-500" />
+                                        <span className="text-text-main"><strong>Unicidad:</strong> El entregable es único.</span>
+                                    </li>
+                                    <li className="flex items-center gap-3 bg-surface border border-border p-3 rounded shadow-sm">
                                         <Users className="text-green-500" />
-                                        <span className="text-text-main"><strong>Elaboración Progresiva:</strong> Se define por pasos.</span>
+                                        <span className="text-text-main"><strong>Recursos Limitados:</strong> Restricciones de dinero y tiempo.</span>
+                                    </li>
+                                    <li className="flex items-center gap-3 bg-surface border border-border p-3 rounded shadow-sm">
+                                        <Target className="text-red-500" />
+                                        <span className="text-text-main"><strong>Objetivos Claros:</strong> Metas SMART definidas.</span>
                                     </li>
                                 </ul>
                             </div>
                         </div>
 
                         {/* Right: Comparison Card */}
-                        <div className="bg-surface dark:bg-slate-800 text-text-main dark:text-white p-6 rounded-xl w-full border border-border shadow-sm transition-colors duration-300 h-full">
+                        <div className={`bg-surface dark:bg-slate-800 text-text-main dark:text-white p-6 rounded-xl w-full border border-border shadow-sm transition-colors duration-300 h-full ${getFocusClass('comparison')}`}>
                             <h3 className="text-lg font-bold text-primary dark:text-amber-400 mb-4 border-b border-border dark:border-slate-600 pb-2">Proyecto VS Operaciones</h3>
                             <div className="grid grid-cols-2 gap-4 text-sm h-fit">
                                 <div className="space-y-2">
@@ -78,7 +104,7 @@ const SlideDefinition = () => {
                     </div>
 
                     {/* Bottom Section: Organization Types */}
-                    <div>
+                    <div className={getFocusClass('types')}>
                         <h3 className="font-bold text-text-main mb-4">Tipos de Organización del Trabajo:</h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="p-4 bg-background rounded-lg border border-border hover:shadow-md transition-shadow">

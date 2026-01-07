@@ -1,214 +1,207 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Volume2, StopCircle, Loader2, AlertCircle } from 'lucide-react';
-import { getAudioFromCache, saveAudioToCache } from '../../utils/audioCache';
+import React, { useState, useEffect, useRef } from 'react';
+import { Volume2, Square } from 'lucide-react';
 
-interface TextToSpeechProps {
+interface TTSStep {
+    id: string;
     text: string;
-    className?: string;
-    preload?: boolean;
 }
 
-const TextToSpeechButton: React.FC<TextToSpeechProps> = ({ text, className = '', preload = true }) => {
-    const [isLoading, setIsLoading] = useState(false);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [isPreloaded, setIsPreloaded] = useState(false); // Visual feedback
-    const [error, setError] = useState<string | null>(null);
+interface TextToSpeechProps {
+    text?: string;
+    steps?: TTSStep[];
+    className?: string;
+    preload?: boolean; // Not used but kept for compat
+    autoPlay?: boolean;
+    rate?: number;
+    onPlayStateChange?: (isPlaying: boolean) => void;
+    onStepChange?: (stepId: string | null) => void;
+}
 
-    // Almacenamos la URL del objeto en memoria para acceso inmediato
-    const audioUrlRef = useRef<string | null>(null);
-    const audioRef = useRef<HTMLAudioElement | null>(null);
+const TextToSpeechButton: React.FC<TextToSpeechProps> = ({
+    text,
+    steps,
+    className = '',
+    autoPlay = false,
+    rate = 1.5,
+    onPlayStateChange,
+    onStepChange
+}) => {
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [isSupported, setIsSupported] = useState(true);
+    const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
     const mountedRef = useRef(true);
 
-    // Limpieza
     useEffect(() => {
         mountedRef.current = true;
+        if (!('speechSynthesis' in window)) {
+            setIsSupported(false);
+            return;
+        }
+
+        // Load voices
+        const loadVoices = () => {
+            const voices = window.speechSynthesis.getVoices();
+            if (mountedRef.current) {
+                setAvailableVoices(voices);
+            }
+        };
+
+        loadVoices();
+
+        // Chrome loads async, so listener is needed
+        if (window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
         return () => {
             mountedRef.current = false;
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current = null;
-            }
-            if (audioUrlRef.current) {
-                URL.revokeObjectURL(audioUrlRef.current);
-            }
+            stopAll();
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Helper: WAV Header
-    const addWavHeader = (pcmData: Uint8Array, sampleRate = 24000, numChannels = 1, bitDepth = 16) => {
-        const header = new ArrayBuffer(44);
-        const view = new DataView(header);
-        const writeString = (view: DataView, offset: number, string: string) => {
-            for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
-        };
-
-        writeString(view, 0, 'RIFF');
-        view.setUint32(4, 36 + pcmData.length, true);
-        writeString(view, 8, 'WAVE');
-        writeString(view, 12, 'fmt ');
-        view.setUint32(16, 16, true);
-        view.setUint16(20, 1, true);
-        view.setUint16(22, numChannels, true);
-        view.setUint32(24, sampleRate, true);
-        view.setUint32(28, sampleRate * numChannels * (bitDepth / 8), true);
-        view.setUint16(32, numChannels * (bitDepth / 8), true);
-        view.setUint16(34, bitDepth, true);
-        writeString(view, 36, 'data');
-        view.setUint32(40, pcmData.length, true);
-
-        const wavBuffer = new Uint8Array(header.byteLength + pcmData.length);
-        wavBuffer.set(new Uint8Array(header), 0);
-        wavBuffer.set(pcmData, header.byteLength);
-        return wavBuffer;
-    };
-
-    // Core Load Logic
-    const fetchAudio = async (): Promise<string> => {
-        // 1. Memoria
-        if (audioUrlRef.current) return audioUrlRef.current;
-
-        // 2. Cache (IndexedDB)
-        const cachedBlob = await getAudioFromCache(text);
-        if (cachedBlob) {
-            console.log("TTS: Cache Hit");
-            const url = URL.createObjectURL(cachedBlob);
-            audioUrlRef.current = url;
-            if (mountedRef.current) setIsPreloaded(true);
-            return url;
-        }
-
-        // 3. Network (Gemini API)
-        const apiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
-        if (!apiKey) throw new Error('Falta API Key');
-
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
-        const payload = {
-            contents: [{ parts: [{ text: `Read aloud clearly: ${text}` }] }],
-            generationConfig: {
-                responseModalities: ["AUDIO"],
-                speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Erinome" } } }
-            }
-        };
-
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-            const errData = await response.json().catch(() => ({}));
-            throw new Error(`Error API (${response.status}): ${errData.error?.message || response.statusText}`);
-        }
-
-        const data = await response.json();
-        const inlineData = data.candidates?.[0]?.content?.parts?.[0]?.inlineData;
-        if (!inlineData?.data) throw new Error('La IA no devolvió audio válido');
-
-        // Decode & Convert
-        const binaryString = window.atob(inlineData.data);
-        const len = binaryString.length;
-        const pcmBytes = new Uint8Array(len);
-        for (let i = 0; i < len; i++) pcmBytes[i] = binaryString.charCodeAt(i);
-
-        const wavData = addWavHeader(pcmBytes);
-        const wavBlob = new Blob([wavData], { type: 'audio/wav' });
-
-        // Save to Cache
-        await saveAudioToCache(text, wavBlob);
-
-        const audioUrl = URL.createObjectURL(wavBlob);
-        audioUrlRef.current = audioUrl;
-        if (mountedRef.current) setIsPreloaded(true);
-        return audioUrl;
-    };
-
-    // Preload Effect
+    // Notify parent of state changes
     useEffect(() => {
-        if (preload && text && !audioUrlRef.current) {
-            fetchAudio().catch(e => console.warn("Preload failed:", e));
+        onPlayStateChange?.(isPlaying);
+    }, [isPlaying, onPlayStateChange]);
+
+    const stopAll = () => {
+        window.speechSynthesis.cancel();
+        if (mountedRef.current) {
+            setIsPlaying(false);
+            onStepChange?.(null);
+        }
+    };
+
+    // Helper to get the best Spanish voice
+    const getBestVoice = (): SpeechSynthesisVoice | null => {
+        if (availableVoices.length === 0) return null;
+
+        // Rankings: 
+        // 1. Google Español (Chrome)
+        // 2. Microsoft Natural (Edge)
+        // 3. Paulina (Mexico) or Monica (Spain) - Common high quality
+        // 4. Any es-ES
+        // 5. Any es-*
+
+        const isGoogle = (v: SpeechSynthesisVoice) => v.name.includes('Google') && v.lang.includes('es');
+        const isMicrosoftNatural = (v: SpeechSynthesisVoice) => v.name.includes('Microsoft') && v.name.includes('Natural') && v.lang.includes('es');
+        const isPremiumEs = (v: SpeechSynthesisVoice) => (v.name.includes('Paulina') || v.name.includes('Monica')) && v.lang.includes('es');
+
+        const best = availableVoices.find(isGoogle)
+            || availableVoices.find(isMicrosoftNatural)
+            || availableVoices.find(isPremiumEs)
+            || availableVoices.find(v => v.lang === 'es-ES')
+            || availableVoices.find(v => v.lang.startsWith('es'));
+
+        return best || null; // Fallback to default if no Spanish voice found (unlikely)
+    };
+
+    const handlePlay = () => {
+        if (isPlaying) {
+            stopAll();
+            return;
+        }
+
+        setIsPlaying(true);
+        window.speechSynthesis.cancel(); // Safety clear
+
+        const selectedVoice = getBestVoice();
+
+        // Debug
+        // console.log("Selected Voice:", selectedVoice?.name);
+
+        if (steps && steps.length > 0) {
+            // Sequence Mode
+            steps.forEach((step, index) => {
+                const utterance = new SpeechSynthesisUtterance(step.text);
+
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                }
+                // Fallback lang if no voice (though voice usually sets lang)
+                utterance.lang = selectedVoice ? selectedVoice.lang : 'es-ES';
+                utterance.rate = rate;
+
+                // Event: Start of this specific step
+                utterance.onstart = () => {
+                    if (mountedRef.current) {
+                        onStepChange?.(step.id);
+                    }
+                };
+
+                // Event: End of sequence?
+                if (index === steps.length - 1) {
+                    utterance.onend = () => {
+                        if (mountedRef.current) {
+                            setIsPlaying(false);
+                            onStepChange?.(null);
+                        }
+                    };
+                }
+
+                utterance.onerror = (e) => {
+                    console.error("TTS Error:", e);
+                    if (mountedRef.current) stopAll();
+                };
+
+                window.speechSynthesis.speak(utterance);
+            });
+        } else if (text) {
+            // Single Text Mode
+            const utterance = new SpeechSynthesisUtterance(text);
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
+            }
+            utterance.lang = selectedVoice ? selectedVoice.lang : 'es-ES';
+            utterance.rate = rate;
+
+            utterance.onend = () => {
+                if (mountedRef.current) setIsPlaying(false);
+            };
+
+            utterance.onerror = () => {
+                if (mountedRef.current) stopAll();
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+    };
+
+    // Auto-play Logic
+    useEffect(() => {
+        if (autoPlay && isSupported && !isPlaying && mountedRef.current) {
+            const timer = setTimeout(() => {
+                handlePlay();
+            }, 500); // Small delay to allow UI to settle
+            return () => clearTimeout(timer);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [text, preload]);
+    }, [autoPlay, isSupported, availableVoices]);
+    // Added availableVoices to dependency: if voices load late, we might want to restart? 
+    // Actually, purely creating the utterance later is better, but this is simple enough.
 
-    const handlePlay = async () => {
-        if (audioRef.current && !isPlaying) {
-            await audioRef.current.play();
-            setIsPlaying(true);
-            return;
-        }
-
-        if (isPlaying) {
-            audioRef.current?.pause();
-            setIsPlaying(false);
-            return;
-        }
-
-        setIsLoading(true);
-        setError(null);
-
-        try {
-            const url = await fetchAudio();
-
-            const audio = new Audio(url);
-            audioRef.current = audio;
-
-            audio.onended = () => {
-                if (mountedRef.current) setIsPlaying(false);
-            };
-            audio.onerror = () => {
-                setError("Error reproducción");
-                if (mountedRef.current) setIsPlaying(false);
-            };
-
-            await audio.play();
-            if (mountedRef.current) setIsPlaying(true);
-
-        } catch (err: any) {
-            console.error("TTS Logic Error:", err);
-            if (mountedRef.current) setError("Error al cargar audio");
-        } finally {
-            if (mountedRef.current) setIsLoading(false);
-        }
-    };
+    if (!isSupported) return null;
 
     return (
-        <div className={`flex items-center gap-2 ${className}`}>
-            {error && (
-                <span className="text-xs text-red-500 flex items-center gap-1 bg-red-100 dark:bg-red-900/30 px-2 py-1 rounded border border-red-200 dark:border-red-800 animate-pulse">
-                    <AlertCircle size={12} /> {error}
-                </span>
+        <button
+            onClick={handlePlay}
+            className={`
+                flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all text-xs font-bold shadow-sm
+                ${isPlaying
+                    ? 'bg-red-100 text-red-600 border-red-200 animate-pulse'
+                    : 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 border-indigo-100 dark:border-indigo-800 hover:bg-indigo-100'
+                } 
+                ${className}
+            `}
+        >
+            {isPlaying ? (
+                <Square size={14} className="fill-current" />
+            ) : (
+                <Volume2 size={14} />
             )}
-
-            <button
-                onClick={handlePlay}
-                disabled={isLoading}
-                className={`
-            flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all
-            ${isPlaying
-                        ? 'bg-red-600 hover:bg-red-700 text-white shadow-[0_0_10px_rgba(220,38,38,0.5)]'
-                        : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg hover:shadow-indigo-500/50'}
-            ${isLoading ? 'opacity-70 cursor-wait' : ''}
-            disabled:opacity-50
-        `}
-                title="Escuchar contenido (Gemini TTS)"
-            >
-                {isLoading ? (
-                    <Loader2 size={14} className="animate-spin" />
-                ) : isPlaying ? (
-                    <StopCircle size={14} />
-                ) : (
-                    <Volume2 size={14} />
-                )}
-
-                {isLoading ? 'Cargando...' : isPlaying ? 'Detener' : 'Escuchar Lección'}
-
-                {/* Visual Indicator for Cached/Preloaded status */}
-                {isPreloaded && !isPlaying && !isLoading && (
-                    <span className="ml-1 w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-[0_0_5px_rgba(74,222,128,0.8)]" title="Audio listo (Cacheado)"></span>
-                )}
-            </button>
-        </div>
+            <span>{isPlaying ? 'Detener' : 'Escuchar Lección'}</span>
+        </button>
     );
 };
 
