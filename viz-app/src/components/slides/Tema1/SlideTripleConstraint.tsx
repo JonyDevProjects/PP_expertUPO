@@ -16,6 +16,7 @@ import {
 
 import { Card } from '../../ui/Card';
 import { H2, Paragraph } from '../../ui/Typography';
+import TextToSpeechButton from '../../shared/TextToSpeechButton';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -70,7 +71,10 @@ const SlideTripleConstraint = () => {
 
             {/* Header */}
             <div className="text-center mb-2 shrink-0">
-                <H2 className="text-xl md:text-2xl mb-2">Gestión de Proyectos</H2>
+                <div className="flex justify-center items-center gap-3">
+                    <H2 className="text-xl md:text-2xl mb-2">Gestión de Proyectos</H2>
+                    <TextToSpeechButton text="La gestión de proyectos equilibra la Triple Restricción: Alcance, Tiempo y Coste. Si cambias uno, afectas a la calidad. Las funciones clave son Planificar, Organizar, Dirigir y Controlar. El flujo de gestión es cíclico: Iniciación, Planificación, Ejecución, Control y Cierre." />
+                </div>
                 <Paragraph className="text-center text-xs md:text-sm max-w-3xl mx-auto mt-0 mb-2">
                     Organizar trabajo para objetivo <span className="font-bold text-amber-600">único</span> y <span className="font-bold text-amber-600">temporal</span>.
                 </Paragraph>

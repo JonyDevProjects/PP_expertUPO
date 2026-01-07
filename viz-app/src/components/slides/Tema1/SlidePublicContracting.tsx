@@ -3,7 +3,10 @@ import SlideContainer from '../../shared/SlideContainer';
 
 const SlidePublicContracting = () => (
     <div className="animate-fade-in space-y-8">
-        <SlideContainer title="Contratación del Sector Público">
+        <SlideContainer
+            title="Contratación del Sector Público"
+            ttsText="En la Contratación Pública, distinguimos entre Suministros (bienes tangibles) y Servicios (desarrollo). Las adjudicaciones pueden ser Menores, Negociadas o Concursos Públicos abiertos."
+        >
             <div className="flex flex-col xl:grid xl:grid-cols-2 gap-8">
                 {/* Tipos de Contrato */}
                 <div className="space-y-4">

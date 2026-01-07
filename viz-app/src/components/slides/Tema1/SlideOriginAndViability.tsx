@@ -4,7 +4,10 @@ import SlideContainer from '../../shared/SlideContainer';
 
 const SlideOriginAndViability = () => (
     <div className="animate-fade-in space-y-8">
-        <SlideContainer title="El Génesis del Proyecto">
+        <SlideContainer
+            title="El Génesis del Proyecto"
+            ttsText="Los proyectos nacen de oportunidades de negocio o requisitos legales. Antes de aprobarse, se analiza su viabilidad mediante el Business Case, comparando costes y riesgos contra los beneficios esperados."
+        >
             <div className="flex flex-col xl:grid xl:grid-cols-3 gap-6">
                 <div className="xl:col-span-1 bg-indigo-900 dark:bg-slate-800 text-white p-6 rounded-xl flex flex-col justify-between">
                     <div>

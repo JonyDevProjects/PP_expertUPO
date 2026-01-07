@@ -4,7 +4,10 @@ import SlideContainer from '../../shared/SlideContainer';
 
 const SlideLifecycle = () => (
     <div className="animate-fade-in space-y-8">
-        <SlideContainer title="Desarrollo de un Proyecto">
+        <SlideContainer
+            title="Desarrollo de un Proyecto"
+            ttsText="El desarrollo de un proyecto se refiere al ciclo de vida técnico del producto. Fases típicas: Conceptualización, Requisitos, Diseño, Construcción y Entrega. Las metodologías, como SCRUM o Waterfall, proporcionan las herramientas para ejecutar este desarrollo."
+        >
             <h3 className="font-bold text-primary flex items-center gap-2 text-lg">
                 Ciclo de Vida
             </h3>

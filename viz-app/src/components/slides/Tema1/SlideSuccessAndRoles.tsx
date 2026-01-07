@@ -4,7 +4,10 @@ import SlideContainer from '../../shared/SlideContainer';
 
 const SlideSuccessAndRoles = () => (
     <div className="animate-fade-in space-y-8">
-        <SlideContainer title="El Factor Humano">
+        <SlideContainer
+            title="El Factor Humano"
+            ttsText="El Director de Proyecto es el responsable del éxito. Sus roles incluyen definir el alcance y liderar al equipo. Necesita habilidades duras y blandas, pasando el 90% del tiempo comunicando."
+        >
             <div className="flex flex-col xl:flex-row gap-8">
                 {/* The PM Profile */}
                 <div className="flex-1 bg-indigo-50 dark:bg-indigo-900/10 p-6 rounded-xl border border-indigo-100 dark:border-indigo-800">

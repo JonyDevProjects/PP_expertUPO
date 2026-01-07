@@ -4,7 +4,10 @@ import SlideContainer from '../../shared/SlideContainer';
 
 const SlideManagementVsBusiness = () => (
     <div className="animate-fade-in space-y-8">
-        <SlideContainer title="Dos Caras de la Misma Moneda">
+        <SlideContainer
+            title="Dos Caras de la Misma Moneda"
+            ttsText="Distinguimos dos procesos: Los de Gestión son internos (RRHH, Finanzas) y buscan eficiencia. Los de Negocio son externos (Ventas, Producción) y generan valor directo al cliente."
+        >
             <div className="flex flex-col xl:grid xl:grid-cols-2 gap-0 overflow-hidden rounded-xl border border-border">
 
                 {/* Gestión */}
