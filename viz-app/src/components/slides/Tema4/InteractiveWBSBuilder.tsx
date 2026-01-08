@@ -12,42 +12,62 @@ const initialData = {
     name: 'Proyecto: Nueva App Móvil',
     type: 'project',
     percentage: 100,
+    children: []
+};
+
+// Simulation States
+const step1_Phases = {
+    ...initialData,
     children: [
+        { id: 'c1', name: '1. Gestión', type: 'phase', percentage: 20, children: [] },
+        { id: 'c2', name: '2. Desarrollo', type: 'phase', percentage: 80, children: [] }
+    ]
+};
+
+const step2_Packages = {
+    ...step1_Phases,
+    children: [
+        step1_Phases.children[0],
         {
-            id: 'c1',
-            name: '1. Gestión',
-            type: 'phase',
-            percentage: 20,
-            children: []
-        },
-        {
-            id: 'c2',
-            name: '2. Desarrollo',
-            type: 'phase',
-            percentage: 50,
+            ...step1_Phases.children[1],
             children: [
-                {
-                    id: 'c2-1',
-                    name: '2.1 Backend',
-                    type: 'package',
-                    percentage: 50,
-                    children: []
-                },
-                {
-                    id: 'c2-2',
-                    name: '2.2 Frontend',
-                    type: 'package',
-                    percentage: 50,
-                    children: []
-                }
+                { id: 'c2-1', name: '2.1 Backend', type: 'package', percentage: 50, children: [] },
+                { id: 'c2-2', name: '2.2 Frontend', type: 'package', percentage: 50, children: [] }
             ]
         }
     ]
 };
 
-export default function InteractiveWBSBuilder() {
-    const [treeData, setTreeData] = useState(initialData);
+const step3_Error = {
+    ...step2_Packages,
+    children: [
+        step1_Phases.children[0],
+        {
+            ...step2_Packages.children[1],
+            children: [
+                { id: 'c2-1', name: '2.1 Backend', type: 'package', percentage: 40, children: [] }, // Error: 40+50 = 90 != 100
+                { id: 'c2-2', name: '2.2 Frontend', type: 'package', percentage: 50, children: [] }
+            ]
+        }
+    ]
+};
+
+interface InteractiveWBSBuilderProps {
+    simulationStep?: number;
+}
+
+export default function InteractiveWBSBuilder({ simulationStep = 0 }: InteractiveWBSBuilderProps) {
+    const [treeData, setTreeData] = useState<any>(initialData);
     const [showGuide, setShowGuide] = useState(true);
+
+    // Simulation Effect
+    React.useEffect(() => {
+        if (simulationStep === 0) setTreeData(initialData); // Empty Project
+        if (simulationStep === 1) setTreeData(step1_Phases); // Add Phases
+        if (simulationStep === 2) setTreeData(step2_Packages); // Add Packages
+        if (simulationStep === 3) setTreeData(step3_Error); // Show Error
+        if (simulationStep === 4) setTreeData(step2_Packages); // Fix Error
+    }, [simulationStep]);
 
     const updateNodeName = (nodeId: string, newName: string, node: any = treeData): any => {
         if (node.id === nodeId) {
@@ -135,7 +155,7 @@ export default function InteractiveWBSBuilder() {
 
                             {node.id !== 'root' && (
                                 <button
-                                    onClick={() => setTreeData(prev => deleteNode(node.id, prev))}
+                                    onClick={() => setTreeData((prev: any) => deleteNode(node.id, prev))}
                                     className="text-slate-300 hover:text-rose-500 transition-colors"
                                     title="Eliminar nodo"
                                 >
@@ -147,7 +167,7 @@ export default function InteractiveWBSBuilder() {
                         <input
                             type="text"
                             value={node.name}
-                            onChange={(e) => setTreeData(prev => updateNodeName(node.id, e.target.value, prev))}
+                            onChange={(e) => setTreeData((prev: any) => updateNodeName(node.id, e.target.value, prev))}
                             className="w-full font-semibold text-slate-800 dark:text-slate-100 border-b border-transparent hover:border-slate-200 dark:hover:border-slate-700 focus:border-blue-500 focus:outline-none bg-transparent transition-colors mb-2"
                         />
 
@@ -158,7 +178,7 @@ export default function InteractiveWBSBuilder() {
                                     type="number"
                                     min="0" max="100"
                                     value={node.percentage}
-                                    onChange={(e) => setTreeData(prev => updateNodePercentage(node.id, e.target.value, prev))}
+                                    onChange={(e) => setTreeData((prev: any) => updateNodePercentage(node.id, e.target.value, prev))}
                                     className={`w-16 p-1 rounded border text-center font-mono font-bold bg-white dark:bg-slate-700
                     ${node.percentage === 0 ? 'text-slate-300 dark:text-slate-500 border-slate-200 dark:border-slate-500' : 'text-blue-600 dark:text-blue-400 border-slate-300 dark:border-slate-500'}
                   `}
@@ -169,14 +189,14 @@ export default function InteractiveWBSBuilder() {
 
                         <div className="mt-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button
-                                onClick={() => setTreeData(prev => addNode(node.id, 'phase', prev))}
+                                onClick={() => setTreeData((prev: any) => addNode(node.id, 'phase', prev))}
                                 className="flex-1 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 text-xs py-1 rounded flex items-center justify-center gap-1"
                                 title="Añadir sub-entregable"
                             >
                                 <FolderOpen className="w-3 h-3" /> Sub
                             </button>
                             <button
-                                onClick={() => setTreeData(prev => addNode(node.id, 'package', prev))}
+                                onClick={() => setTreeData((prev: any) => addNode(node.id, 'package', prev))}
                                 className="flex-1 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-300 text-xs py-1 rounded flex items-center justify-center gap-1"
                                 title="Añadir paquete de trabajo"
                             >

@@ -1,12 +1,50 @@
-
+import { useState } from 'react';
 import SlideContainer from '../../shared/SlideContainer';
 import CriticalPathFinder from './CriticalPathFinder';
 import { AlertTriangle, GitCommit } from 'lucide-react';
 
-const SlideCPM = () => {
+const SlideCPM = ({ autoPlay, onAudioComplete }: { autoPlay?: boolean; onAudioComplete?: () => void }) => {
+    const [simulationStep, setSimulationStep] = useState(0);
+
+    const ttsSteps = [
+        {
+            id: 'intro',
+            text: "El Método de la Ruta Crítica, o CPM, nos ayuda a calcular la duración mínima del proyecto.",
+        },
+        {
+            id: 'path1',
+            text: "Debemos analizar todas las rutas posibles. Por ejemplo, la ruta superior tiene una duración de 5 días.",
+        },
+        {
+            id: 'path3_hover',
+            text: "Pero si miramos la ruta inferior, vemos que B y D suman más tiempo.",
+        },
+        {
+            id: 'critical_select',
+            text: "La Ruta Crítica es la secuencia más larga. En este caso, 12 días. Cualquier retraso aquí, retrasará todo el proyecto. Su holgura es CERO.",
+        }
+    ];
+
+    const handleStepChange = (stepId: string | null) => {
+        if (stepId === 'intro') setSimulationStep(0);
+        if (stepId === 'path1') setSimulationStep(1); // Hover Path 1
+        if (stepId === 'path3_hover') setSimulationStep(2); // Hover Path 3
+        if (stepId === 'critical_select') setSimulationStep(3); // Select Path 3 (Critical)
+
+        if (stepId === null && onAudioComplete) {
+            onAudioComplete();
+        }
+    };
+
     return (
-        <SlideContainer title="3. Ruta Crítica (CPM)">
-            <CriticalPathFinder />
+        <SlideContainer
+            title="3. Ruta Crítica (CPM)"
+            rate={1.2}
+            ttsSteps={ttsSteps}
+            autoPlay={autoPlay}
+            onStepChange={handleStepChange}
+        >
+            <CriticalPathFinder simulationStep={simulationStep} />
 
             <div className="mt-8 bg-slate-50 dark:bg-slate-800/50 p-6 rounded-xl border border-slate-200 dark:border-slate-700">
                 <div className="flex items-start gap-4">
@@ -21,7 +59,7 @@ const SlideCPM = () => {
                             La <strong>Ruta Crítica</strong> es la secuencia de actividades con la mayor duración total a través de la red del proyecto. Determina la duración más corta posible para completar el proyecto.
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                            <div className="bg-white dark:bg-slate-800 p-3 rounded border border-slate-200 dark:border-slate-700">
+                            <div className={`transition-all duration-500 ${simulationStep === 3 ? 'ring-2 ring-rose-500 bg-rose-50 dark:bg-rose-900/20' : 'bg-white dark:bg-slate-800'} p-3 rounded border border-slate-200 dark:border-slate-700`}>
                                 <strong className="text-rose-600 dark:text-rose-400 text-sm block mb-1">Holgura Total (Float) = 0</strong>
                                 <span className="text-xs text-slate-500 dark:text-slate-400">
                                     Las actividades críticas no tienen margen. Cualquier retraso en ellas retrasa la fecha fin del proyecto.

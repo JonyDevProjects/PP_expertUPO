@@ -75,9 +75,20 @@ const InfographicDeck = () => {
         }
     ];
 
+    const handleAudioComplete = () => {
+        if (activeTab < slides.length - 1) {
+            setActiveTab(prev => prev + 1);
+        } else {
+            setAutoPlayEnabled(false);
+        }
+    };
+
     const renderContent = () => {
         // Pass autoPlay prop to all slides
-        const props = { autoPlay: autoPlayEnabled };
+        const props = {
+            autoPlay: autoPlayEnabled,
+            onAudioComplete: handleAudioComplete
+        };
 
         switch (activeTab) {
             case 0: return <SlideDefinition {...props} />;

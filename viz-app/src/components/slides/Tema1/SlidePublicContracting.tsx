@@ -13,7 +13,7 @@ const steps = [
     }
 ];
 
-const SlidePublicContracting = ({ autoPlay }: { autoPlay?: boolean }) => {
+const SlidePublicContracting = ({ autoPlay, onAudioComplete }: { autoPlay?: boolean; onAudioComplete?: () => void }) => {
     const [activeStep, setActiveStep] = useState<string | null>(null);
 
     // Helper class for focus mode
@@ -30,7 +30,10 @@ const SlidePublicContracting = ({ autoPlay }: { autoPlay?: boolean }) => {
                 title="Contratación del Sector Público"
                 rate={1.2}
                 ttsSteps={steps}
-                onStepChange={setActiveStep}
+                onStepChange={(id) => {
+                    setActiveStep(id);
+                    if (!id) onAudioComplete?.();
+                }}
                 autoPlay={autoPlay}
             >
                 <div className="flex flex-col xl:grid xl:grid-cols-2 gap-8">

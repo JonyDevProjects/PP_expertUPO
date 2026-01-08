@@ -2,13 +2,16 @@
 import { Briefcase, CheckCircle, TrendingUp } from 'lucide-react';
 import SlideContainer from '../../shared/SlideContainer';
 
-const SlideManagementVsBusiness = ({ autoPlay }: { autoPlay?: boolean }) => (
+const SlideManagementVsBusiness = ({ autoPlay, onAudioComplete }: { autoPlay?: boolean; onAudioComplete?: () => void }) => (
     <div className="animate-fade-in space-y-8">
         <SlideContainer
             title="Dos Caras de la Misma Moneda"
             rate={1.2}
             ttsText="Distinguimos dos procesos: Los de Gestión son internos (RRHH, Finanzas) y buscan eficiencia. Los de Negocio son externos (Ventas, Producción) y generan valor directo al cliente."
             autoPlay={autoPlay}
+            onStepChange={(id) => {
+                if (!id) onAudioComplete?.();
+            }}
         >
             <div className="flex flex-col xl:grid xl:grid-cols-2 gap-0 overflow-hidden rounded-xl border border-border">
 

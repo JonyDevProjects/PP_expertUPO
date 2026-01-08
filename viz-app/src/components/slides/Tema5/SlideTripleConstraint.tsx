@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Layers, Clock, DollarSign, Unlock, Lock, RefreshCw, Info } from 'lucide-react';
 import { Card } from '../../ui/Card';
+import SlideContainer from '../../shared/SlideContainer';
 
-const SlideTripleConstraint = () => {
+const SlideTripleConstraint = ({ autoPlay, onAudioComplete }: { autoPlay?: boolean; onAudioComplete?: () => void }) => {
     // Estado inicial: valores del 0 al 100
     const [scope, setScope] = useState(70);
     const [time, setTime] = useState(70);
@@ -16,6 +17,51 @@ const SlideTripleConstraint = () => {
 
     // Modos de gestión: 'Manual', 'FixedScope' (Alcance Fijo), 'FixedDeadline' (Fecha Fija)
     const [mode, setMode] = useState('Manual');
+
+    // TTS & Simulation Logic
+    const ttsSteps = [
+        {
+            id: 'intro',
+            text: "La Triple Restricción conecta Alcance, Tiempo y Coste. Si cambias uno, los otros se mueven para mantener la Calidad."
+        },
+        {
+            id: 'reduce_cost',
+            text: "Imagina que nos recortan el presupuesto (Coste). En modo manual, reducimos el coste al 40%."
+        },
+        {
+            id: 'consequence',
+            text: "Para compensar y no perder calidad, el Tiempo debe aumentar (se tarda más con menos recursos).",
+        },
+        {
+            id: 'breakage',
+            text: "Si forzamos el triángulo: queremos mucho Alcance, con poco Tiempo y poco Dinero... ¡El proyecto se rompe!",
+        }
+    ];
+
+    const handleStepChange = (stepId: string | null) => {
+        if (stepId === 'intro') {
+            resetSim();
+        }
+        if (stepId === 'reduce_cost') {
+            setMode('Manual');
+            setCost(40); // Reduce cost
+        }
+        if (stepId === 'consequence') {
+            // Simulate natural adjustment: If cost is low, time increases to maintain balance logic
+            // capacity = time * cost. required = scope * 60.
+            // If cost=40, time needs to be high.
+            setTime(90);
+        }
+        if (stepId === 'breakage') {
+            setScope(90);
+            setTime(30);
+            setCost(30); // Excessive stress -> Break
+        }
+
+        if (stepId === null && onAudioComplete) {
+            onAudioComplete();
+        }
+    };
 
     // Cálculo de la Calidad y estado del triángulo
     useEffect(() => {
@@ -114,19 +160,14 @@ const SlideTripleConstraint = () => {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
-            {/* Header */}
-            <div className="bg-slate-900 text-white p-6 rounded-xl shadow-lg border-l-4 border-blue-500">
-                <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div>
-                        <h2 className="text-2xl font-bold flex items-center gap-3 text-blue-400">
-                            <Layers className="w-8 h-8" />
-                            La Triple Restricción
-                        </h2>
-                        <p className="text-slate-300 mt-1">El "Triángulo de Hierro": Visualiza el impacto de tus decisiones.</p>
-                    </div>
-                </div>
-            </div>
+        <SlideContainer
+            title="1. Triple Restricción"
+            rate={1.2}
+            ttsSteps={ttsSteps}
+            autoPlay={autoPlay}
+            onStepChange={handleStepChange}
+        >
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Panel Visual (Izquierda) */}
@@ -335,7 +376,7 @@ const SlideTripleConstraint = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </SlideContainer>
     );
 };
 

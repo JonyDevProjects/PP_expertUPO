@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import SlideContainer from '../../shared/SlideContainer';
 
-const SlideExecution = () => {
+const SlideExecution = ({ autoPlay, onAudioComplete }: { autoPlay?: boolean; onAudioComplete?: () => void }) => {
     // --- STATE 1: RESOURCE LEVELING ---
     const [isLeveled, setIsLeveled] = useState(false);
 
@@ -37,12 +37,44 @@ const SlideExecution = () => {
     // --- STATE 3: QUALITY FLOW ---
     const [qualityStep, setQualityStep] = useState(0);
 
-    return (
-        <SlideContainer title="Ejecución: El Motor del Proyecto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full pb-4">
+    const ttsSteps = [
+        {
+            id: "intro",
+            text: "Ejecución: El Motor del Proyecto. En esta fase coordinamos personas y recursos para transformar el plan en entregables reales."
+        },
+        {
+            id: "recursos",
+            text: "Gestión de Recursos. La nivelación distribuye la carga de trabajo asignada para evitar sobrecargas y burnout, aunque esto pueda extender el cronograma."
+        },
+        {
+            id: "tuckman",
+            text: "Desarrollo del Equipo. Según el modelo de Tuckman, los equipos pasan inevitablemente por fases de Formación y Turbulencia antes de alcanzar la Normalización y el Alto Desempeño."
+        },
+        {
+            id: "calidad",
+            text: "Calidad. No basta con hacer el trabajo. Debemos generar Datos de Desempeño, crear un Entregable, controlarlo internamente y finalmente obtener un Entregable Verificado."
+        }
+    ];
 
+    return (
+        <SlideContainer
+            title="Ejecución: El Motor del Proyecto"
+            rate={1.2}
+            ttsSteps={ttsSteps}
+            autoPlay={autoPlay}
+            onStepChange={(id) => {
+                if (!id) {
+                    onAudioComplete?.();
+                    return;
+                }
+                if (id === 'recursos') setIsLeveled(true);
+                if (id === 'tuckman') setTuckmanStage(3); // Jump to Performing
+                if (id === 'calidad') setQualityStep(3); // Show full flow
+            }}
+        >
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full pb-4">
                 {/* WIDGET 1: GESTIÓN DE RECURSOS (Nivelación) */}
-                <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md border-l-4 border-blue-500 overflow-hidden flex flex-col">
+                <div className={`bg-white dark:bg-slate-800 rounded-xl shadow-md border-l-4 border-blue-500 overflow-hidden flex flex-col transition-all duration-500 ${isLeveled ? 'ring-2 ring-blue-400' : ''}`}>
                     <div className="p-4 bg-slate-50 dark:bg-slate-800 border-b dark:border-slate-700 flex justify-between items-center">
                         <h3 className="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
                             <Users className="w-5 h-5 text-blue-500" />

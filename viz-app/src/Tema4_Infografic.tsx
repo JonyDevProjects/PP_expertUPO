@@ -19,6 +19,8 @@ interface SlideItem {
 
 const Tema4_Infografic = () => {
     const [activeTab, setActiveTab] = useState(0);
+    const [autoPlayEnabled, setAutoPlayEnabled] = useState(false);
+    const [audioSequenceStep, setAudioSequenceStep] = useState(0);
 
     const slides: SlideItem[] = [
         {
@@ -43,16 +45,49 @@ const Tema4_Infografic = () => {
         }
     ];
 
+    // Reset sequence on tab change
+    if (activeTab !== audioSequenceStep && autoPlayEnabled) {
+        // This logic keeps tab in sync with audio sequence if user didn't manually change tab
+        // If user manually changes tab, we might want to respect that, but for auto-play, we generally drive tab via sequence.
+        // Actually, simpler approach used in Tema 3:
+    }
+
+    // Effect to switch tabs based on sequence step? 
+    // In Tema 3 we did manually syncing or just let `audioSequenceStep` drive components if they are all rendered. 
+    // But here we switch tabs. 
+    // Let's copy the pattern: if autoPlay is on, `audioSequenceStep` determines the active concept.
+    // However, `renderContent` switches based on `activeTab`. 
+    // We need to sync them if we want auto-advance across tabs.
+
+    // For now, let's just pass the props and handle the logic:
+    const handleAudioComplete = () => {
+        if (activeTab < slides.length - 1) {
+            setAudioSequenceStep(0); // Reset internal step for next slide
+            setActiveTab(prev => prev + 1);
+        } else {
+            setAutoPlayEnabled(false); // End of show
+        }
+    };
+
+    const getProps = () => ({
+        autoPlay: autoPlayEnabled,
+        onAudioComplete: handleAudioComplete
+    });
+
     const renderContent = () => {
         switch (activeTab) {
             case 0:
-                return <SlideScope />;
+                // @ts-ignore
+                return <SlideScope {...getProps()} />;
             case 1:
-                return <SlideSequencing />;
+                // @ts-ignore
+                return <SlideSequencing {...getProps()} />;
             case 2:
-                return <SlideCPM />;
+                // @ts-ignore
+                return <SlideCPM {...getProps()} />;
             case 3:
-                return <SlideOptimization />;
+                // @ts-ignore
+                return <SlideOptimization {...getProps()} />;
             default:
                 return null;
         }
@@ -61,7 +96,21 @@ const Tema4_Infografic = () => {
     return (
         <div className="w-full max-w-6xl mx-auto space-y-8 pb-20">
             {/* Header */}
-            <header className="text-center space-y-4 mb-12">
+            <header className="text-center space-y-4 mb-12 relative">
+                <div className="absolute top-0 right-0">
+                    <button
+                        onClick={() => setAutoPlayEnabled(!autoPlayEnabled)}
+                        className={`
+                            flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all
+                            ${autoPlayEnabled
+                                ? 'bg-orange-600 text-white shadow-lg shadow-orange-500/30 ring-2 ring-orange-400 ring-offset-2 dark:ring-offset-slate-900'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                            }
+                        `}
+                    >
+                        {autoPlayEnabled ? 'Modo Lectura: ON' : 'Modo Lectura: OFF'}
+                    </button>
+                </div>
                 <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-orange-500 to-rose-600 bg-clip-text text-transparent">
                     Tema 4: Planificación, Alcance y Cronograma
                 </h1>

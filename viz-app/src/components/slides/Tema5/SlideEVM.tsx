@@ -1,12 +1,49 @@
 import { useState } from 'react';
-import { TrendingUp, DollarSign, Clock, ArrowRight, Calculator } from 'lucide-react';
+import { TrendingUp, DollarSign, Clock, ArrowRight } from 'lucide-react';
 import { Card } from '../../ui/Card';
+import SlideContainer from '../../shared/SlideContainer';
 
-const SlideEVM = () => {
+const SlideEVM = ({ autoPlay, onAudioComplete }: { autoPlay?: boolean; onAudioComplete?: () => void }) => {
     // Estado para entradas manuales
     const [pv, setPv] = useState(1000); // Planned Value
     const [ev, setEv] = useState(900);  // Earned Value
     const [ac, setAc] = useState(1100); // Actual Cost
+
+    // TTS & Simulation Logic
+    const ttsSteps = [
+        {
+            id: 'intro',
+            text: "El Análisis de Valor Ganado (EVM) es el termómetro del proyecto. Diagnostica salud en tiempo y coste."
+        },
+        {
+            id: 'bad_scenario',
+            text: "Veamos un caso crítico: Gastamos 1200 (AC) para hacer un trabajo que valía 800 (EV). Estamos gastando de más y vamos retrasados.",
+        },
+        {
+            id: 'good_scenario',
+            text: "Ahora un caso ideal: Gastamos 900 (AC) para completar trabajo por valor de 1000 (EV). ¡Eficiencia pura!",
+        }
+    ];
+
+    const handleStepChange = (stepId: string | null) => {
+        if (stepId === 'intro') {
+            setPv(1000); setEv(900); setAc(1100); // Default
+        }
+        if (stepId === 'bad_scenario') {
+            setPv(1000); // Planned
+            setEv(800);  // Earned (Less than planned -> Late)
+            setAc(1200); // Cost (More than earned -> Expensive)
+        }
+        if (stepId === 'good_scenario') {
+            setPv(1000); // Planned
+            setEv(1000); // Earned (On track schedule-wise, actually match planned for clarity, or exceeding)
+            setAc(900);  // Cost (Less than earned -> Saving money)
+        }
+
+        if (stepId === null && onAudioComplete) {
+            onAudioComplete();
+        }
+    };
 
     // Cálculos automáticos
     const cv = ev - ac; // Cost Variance
@@ -26,19 +63,14 @@ const SlideEVM = () => {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
-            {/* Header */}
-            <div className="bg-slate-900 text-white p-6 rounded-xl shadow-lg border-l-4 border-purple-500">
-                <div className="flex justify-between items-center">
-                    <div>
-                        <h2 className="text-2xl font-bold flex items-center gap-3 text-purple-400">
-                            <Calculator className="w-8 h-8" />
-                            Calculadora EVM
-                        </h2>
-                        <p className="text-slate-300 mt-1">Gestión del Valor Ganado: Introduce tus datos y diagnostica el proyecto.</p>
-                    </div>
-                </div>
-            </div>
+        <SlideContainer
+            title="4. Control y EVM (Valor Ganado)"
+            rate={1.2}
+            ttsSteps={ttsSteps}
+            autoPlay={autoPlay}
+            onStepChange={handleStepChange}
+        >
+
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Panel de Inputs */}
@@ -222,7 +254,7 @@ const SlideEVM = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </SlideContainer>
     );
 };
 

@@ -18,7 +18,7 @@ const steps = [
     }
 ];
 
-const SlideSuccessAndRoles = ({ autoPlay }: { autoPlay?: boolean }) => {
+const SlideSuccessAndRoles = ({ autoPlay, onAudioComplete }: { autoPlay?: boolean; onAudioComplete?: () => void }) => {
     const [activeStep, setActiveStep] = useState<string | null>(null);
 
     // Helper class for focus mode
@@ -35,7 +35,10 @@ const SlideSuccessAndRoles = ({ autoPlay }: { autoPlay?: boolean }) => {
                 title="El Factor Humano"
                 rate={1.2}
                 ttsSteps={steps}
-                onStepChange={setActiveStep}
+                onStepChange={(id) => {
+                    setActiveStep(id);
+                    if (!id) onAudioComplete?.();
+                }}
                 autoPlay={autoPlay}
             >
                 <div className="flex flex-col xl:flex-row gap-8">

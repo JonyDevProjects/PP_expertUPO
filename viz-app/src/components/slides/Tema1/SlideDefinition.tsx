@@ -3,7 +3,7 @@ import { Target, Clock, Users, BookOpen } from 'lucide-react';
 import SlideContainer from '../../shared/SlideContainer';
 import definitionData from '../../../data/locales/Tema1/definition.json';
 
-const SlideDefinition = ({ autoPlay }: { autoPlay?: boolean }) => {
+const SlideDefinition = ({ autoPlay, onAudioComplete }: { autoPlay?: boolean; onAudioComplete?: () => void }) => {
     const [activeStep, setActiveStep] = useState<string | null>(null);
 
     // Helper class for focus mode
@@ -33,7 +33,10 @@ const SlideDefinition = ({ autoPlay }: { autoPlay?: boolean }) => {
                 title="¿Qué es un Proyecto?"
                 rate={1.2}
                 ttsSteps={ttsSteps}
-                onStepChange={setActiveStep}
+                onStepChange={(id) => {
+                    setActiveStep(id);
+                    if (!id) onAudioComplete?.();
+                }}
                 autoPlay={autoPlay}
             >
                 <div className="flex flex-col gap-8 h-full">

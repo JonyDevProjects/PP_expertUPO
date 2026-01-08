@@ -23,7 +23,7 @@ import TabCurves from './components/TripleConstraint/TabCurves';
 import TabAreas from './components/TripleConstraint/TabAreas';
 import TabMatrix from './components/TripleConstraint/TabMatrix';
 
-const SlideTripleConstraint = ({ autoPlay }: { autoPlay?: boolean }) => {
+const SlideTripleConstraint = ({ autoPlay, onAudioComplete }: { autoPlay?: boolean; onAudioComplete?: () => void }) => {
     const {
         activeTab,
         setActiveTab,
@@ -65,7 +65,10 @@ const SlideTripleConstraint = ({ autoPlay }: { autoPlay?: boolean }) => {
                 title={uiHeader.title}
                 rate={1.1} // Slightly slower for better comprehension of steps
                 ttsSteps={steps}
-                onStepChange={setActiveStep}
+                onStepChange={(id) => {
+                    setActiveStep(id);
+                    if (!id) onAudioComplete?.();
+                }}
                 autoPlay={autoPlay}
                 className="h-full flex flex-col"
             >

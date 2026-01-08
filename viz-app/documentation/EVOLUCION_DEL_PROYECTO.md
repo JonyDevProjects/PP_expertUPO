@@ -111,3 +111,31 @@ Se migraron y adaptaron visualizaciones que antes residían en documentación al
 1.  **Prioridad 0 (Seguridad)**: Instalar `Vitest` y crear el primer test de humo ("Smoke Test") para asegurar que la App renderiza.
 2.  **Prioridad 1 (Limpieza)**: Extraer todos los textos "hardcoded" de `Search`, `Definition` y `TripleConstraint` a archivos JSON en `src/data/locales/`.
 3.  **Prioridad 2 (Escalabilidad)**: Refactorizar `SlideTripleConstraint` para desacoplar la máquina de estados de la vista.
+
+## 7. Avances de Enero 2026: Testing, Limpieza y Escalado
+*Implementación de la Hoja de Ruta (Puntos 6.C.1, 6.C.2, 6.C.3)*
+
+Se completó con éxito el ciclo de mejora propuesto, estableciendo una base más sólida para el crecimiento futuro de la aplicación.
+
+### A. Prioridad 0: Red de Seguridad (Testing)
+Se instaló e integró **Vitest** junto con `React Testing Library`.
+- **Desafíos Encontrados**:
+    - **Compatibilidad con Node 16**: El proyecto corre en Node 16.20.2, lo que causó conflictos con las versiones más recientes de Vitest y Testing Library que exigen Node 18+. Se resolvió anclando versiones específicas (`vitest@0.34.6`, `jsdom@22.1.0`).
+    - **Dependencias Peer**: Conflicto entre `react@19` (instalado) y `@testing-library/react@14` (que espera react 18). Se mitigó usando versiones compatibles y overrides.
+    - **Mocks Globales**: Componentes dependientes de `window.matchMedia` fallaban en JSDOM. Se creó `src/test/setup.ts` para mockear estas APIs del navegador.
+- **Resultado**: Test de humo funcional (`npm test`) que verifica el renderizado de la App sin fallos.
+
+### B. Prioridad 1: Extracción de Textos (Limpieza)
+Se eliminó el "Hardcoded Text" de los componentes principales del Tema 1.
+- **Arquitectura de Datos**: Se creó el directorio `src/data/locales/Tema1/` con archivos JSON (`definition.json`, `originViability.json`, `tripleConstraint.json`).
+- **Adaptación TypeScript**: TypeScript inicialmente no permitía importar JSONs en modo `ESNext` sin configuración extra. Se añadió `src/declarations.d.ts` y se ajustó `tsconfig.app.json` (`resolveJsonModule: true`).
+- **Beneficio**: Los componentes `SlideDefinition`, `SlideOriginAndViability` y `SlideTripleConstraint` ya no mezclan contenido con lógica, siendo este el primer paso hacia la internacionalización (i18n).
+
+### C. Prioridad 2: Refactorización Triple Constraint (Escalabilidad)
+Se abordó la complejidad ciclomática de `SlideTripleConstraint`.
+- **Problema**: El componente manejaba manualmente 6 estados discretos y efectos secundarios complejos para sincronizar la narración (TTS) con la UI.
+- **Solución (Custom Hook)**: Se extrajo toda la lógica de estado a `src/components/slides/Tema1/hooks/useTripleConstraintState.ts`.
+- **Resultado**: `SlideTripleConstraint.tsx` redujo su tamaño y complejidad drásticamente, convirtiéndose en un componente puramente presentacional (Dumb Component) que recibe datos y handlers de su "cerebro" (Smart Hook).
+
+### Conclusión del Ciclo
+El proyecto ha pasado de ser un prototipo frágil a una aplicación con infraestructura de tests, separación clara de conceptos (Datos/Lógica/Vista) y una arquitectura preparada para escalar al Tema 2 y más allá.

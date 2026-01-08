@@ -105,7 +105,7 @@ const EvmCalculator = () => {
 
 const SlideEVM = () => {
     return (
-        <SlideContainer title="Gestión del Valor Ganado (EVM)" className="animate-fade-in">
+        <SlideContainer title="Gestión del Valor Ganado (EVM)" rate={1.2} className="animate-fade-in">
             <div className="bg-teal-50 dark:bg-teal-900/20 border-l-4 border-teal-600 p-6 mb-8 rounded-r-lg">
                 <p className="text-teal-800 dark:text-teal-200">
                     La metodología que integra alcance, cronograma y recursos para medir el desempeño y el progreso del proyecto de manera objetiva.

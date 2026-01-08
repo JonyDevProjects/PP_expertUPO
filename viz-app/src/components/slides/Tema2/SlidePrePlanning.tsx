@@ -9,8 +9,9 @@ import {
     CheckCircle,
     HelpCircle
 } from 'lucide-react';
+import SlideContainer from '../../shared/SlideContainer';
 
-const SlidePrePlanning = () => {
+const SlidePrePlanning = ({ autoPlay, onAudioComplete }: { autoPlay?: boolean; onAudioComplete?: () => void }) => {
     const [currentStep, setCurrentStep] = useState(0);
 
     const steps = [
@@ -89,81 +90,103 @@ const SlidePrePlanning = () => {
         }
     ];
 
+    // Generate TTS steps derived from content
+    const ttsSteps = steps.map(step => ({
+        id: String(step.id),
+        text: `${step.title}. ${step.subtitle}. ${step.content.map(c => `${c.label}: ${c.text}`).join(" ")}`
+    }));
+
     return (
-        <div className="min-h-[calc(100vh-100px)] p-4 md:p-8 font-sans">
+        <div className="animate-fade-in p-4 md:p-8 font-sans">
+            <SlideContainer
+                title="Ruta de Pre-Planificación"
+                rate={1.2}
+                ttsSteps={ttsSteps}
+                autoPlay={autoPlay}
+                onStepChange={(id) => {
+                    if (!id) {
+                        onAudioComplete?.();
+                        return;
+                    }
+                    if (id) {
+                        const index = parseInt(id) - 1;
+                        if (!isNaN(index) && index >= 0 && index < steps.length) {
+                            setCurrentStep(index);
+                        }
+                    }
+                }}
+            >
+                <div>
+                    <div className="text-center mb-10">
+                        <p className="text-muted-foreground max-w-2xl mx-auto">
+                            Antes de crear el cronograma, debemos definir el "Qué" y el "Por qué".
+                            Este es el flujo crítico desde la idea hasta la autorización formal.
+                        </p>
+                    </div>
 
-            <div className="max-w-6xl mx-auto">
-                <div className="text-center mb-10">
-                    <h1 className="text-3xl font-bold mb-2">Ruta de Pre-Planificación</h1>
-                    <p className="text-muted-foreground max-w-2xl mx-auto">
-                        Antes de crear el cronograma, debemos definir el "Qué" y el "Por qué".
-                        Este es el flujo crítico desde la idea hasta la autorización formal.
-                    </p>
-                </div>
-
-                {/* Navigation Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                    {steps.map((step, index) => (
-                        <button
-                            key={step.id}
-                            onClick={() => setCurrentStep(index)}
-                            className={`flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 border-b-4 shadow-sm ${currentStep === index
-                                ? `bg-white dark:bg-slate-800 ${step.color} translate-y-1 shadow-inner`
-                                : 'bg-white dark:bg-slate-800 border-transparent hover:bg-slate-50 dark:hover:bg-slate-800 hover:-translate-y-1'
-                                }`}
-                        >
-                            <div className={`mb-2 p-2 rounded-full ${currentStep === index ? step.bg : 'bg-muted'} dark:bg-opacity-20`}>
-                                {step.icon}
-                            </div>
-                            <span className={`font-bold text-sm ${currentStep === index ? 'text-card-foreground' : 'text-muted-foreground'}`}>
-                                {step.title}
-                            </span>
-                        </button>
-                    ))}
-                </div>
-
-                {/* Main Content Card */}
-                <div className={`relative w-full bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden border-t-8 ${steps[currentStep].color} transition-all duration-300`}>
-
-                    <div className="p-8 md:p-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        {/* Header of Card */}
-                        <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8">
-                            <div className={`p-4 rounded-full ${steps[currentStep].bg} shadow-inner`}>
-                                {steps[currentStep].icon}
-                            </div>
-                            <div className="text-center md:text-left flex-1">
-                                <h2 className="text-2xl md:text-3xl font-bold text-card-foreground">{steps[currentStep].title}</h2>
-                                <p className="text-lg text-muted-foreground font-medium">{steps[currentStep].subtitle}</p>
-                            </div>
-                            <div className="text-4xl font-black text-slate-100 dark:text-slate-800 hidden md:block">
-                                0{steps[currentStep].id}
-                            </div>
-                        </div>
-
-                        {/* Content Body */}
-                        <div className="grid md:grid-cols-2 gap-6">
-                            {steps[currentStep].content.map((item, index) => (
-                                <div key={index} className="bg-white dark:bg-slate-800 p-5 rounded-xl border border-border hover:shadow-md transition-shadow">
-                                    <h3 className="font-bold text-card-foreground mb-2 flex items-center gap-2">
-                                        <CheckCircle className="w-4 h-4 text-indigo-500" />
-                                        {item.label}
-                                    </h3>
-                                    <p className="text-muted-foreground text-sm leading-relaxed">
-                                        {item.text}
-                                    </p>
+                    {/* Navigation Grid */}
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                        {steps.map((step, index) => (
+                            <button
+                                key={step.id}
+                                onClick={() => setCurrentStep(index)}
+                                className={`flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 border-b-4 shadow-sm ${currentStep === index
+                                    ? `bg-white dark:bg-slate-800 ${step.color} translate-y-1 shadow-inner`
+                                    : 'bg-white dark:bg-slate-800 border-transparent hover:bg-slate-50 dark:hover:bg-slate-800 hover:-translate-y-1'
+                                    }`}
+                            >
+                                <div className={`mb-2 p-2 rounded-full ${currentStep === index ? step.bg : 'bg-muted'} dark:bg-opacity-20`}>
+                                    {step.icon}
                                 </div>
-                            ))}
-                        </div>
+                                <span className={`font-bold text-sm ${currentStep === index ? 'text-card-foreground' : 'text-muted-foreground'}`}>
+                                    {step.title}
+                                </span>
+                            </button>
+                        ))}
+                    </div>
 
-                        {/* Helper Tip */}
-                        <div className="mt-8 flex items-center gap-2 text-muted-foreground text-sm bg-muted px-4 py-2 rounded-full shadow-sm border border-border mx-auto w-fit">
-                            <HelpCircle className="w-4 h-4" />
-                            <span>Tip de PMP: Este proceso culmina con el <strong>Project Charter</strong>. Sin él, no debes iniciar la planificación detallada.</span>
+                    {/* Main Content Card */}
+                    <div className={`relative w-full bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden border-t-8 ${steps[currentStep].color} transition-all duration-300`}>
+
+                        <div className="p-8 md:p-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            {/* Header of Card */}
+                            <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8">
+                                <div className={`p-4 rounded-full ${steps[currentStep].bg} shadow-inner`}>
+                                    {steps[currentStep].icon}
+                                </div>
+                                <div className="text-center md:text-left flex-1">
+                                    <h2 className="text-2xl md:text-3xl font-bold text-card-foreground">{steps[currentStep].title}</h2>
+                                    <p className="text-lg text-muted-foreground font-medium">{steps[currentStep].subtitle}</p>
+                                </div>
+                                <div className="text-4xl font-black text-slate-100 dark:text-slate-800 hidden md:block">
+                                    0{steps[currentStep].id}
+                                </div>
+                            </div>
+
+                            {/* Content Body */}
+                            <div className="grid md:grid-cols-2 gap-6">
+                                {steps[currentStep].content.map((item, index) => (
+                                    <div key={index} className="bg-white dark:bg-slate-800 p-5 rounded-xl border border-border hover:shadow-md transition-shadow">
+                                        <h3 className="font-bold text-card-foreground mb-2 flex items-center gap-2">
+                                            <CheckCircle className="w-4 h-4 text-indigo-500" />
+                                            {item.label}
+                                        </h3>
+                                        <p className="text-muted-foreground text-sm leading-relaxed">
+                                            {item.text}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Helper Tip */}
+                            <div className="mt-8 flex items-center gap-2 text-muted-foreground text-sm bg-muted px-4 py-2 rounded-full shadow-sm border border-border mx-auto w-fit">
+                                <HelpCircle className="w-4 h-4" />
+                                <span>Tip de PMP: Este proceso culmina con el <strong>Project Charter</strong>. Sin él, no debes iniciar la planificación detallada.</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-            </div>
+            </SlideContainer>
         </div>
     );
 };

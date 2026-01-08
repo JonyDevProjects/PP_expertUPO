@@ -19,6 +19,15 @@ interface SlideItem {
 
 const Tema5_Infografic = () => {
     const [activeTab, setActiveTab] = useState(0);
+    const [autoPlayEnabled, setAutoPlayEnabled] = useState(false);
+
+    const handleAudioComplete = () => {
+        if (activeTab < slides.length - 1) {
+            setActiveTab(prev => prev + 1);
+        } else {
+            setAutoPlayEnabled(false);
+        }
+    };
 
     const slides: SlideItem[] = [
         {
@@ -44,15 +53,20 @@ const Tema5_Infografic = () => {
     ];
 
     const renderContent = () => {
+        const props = {
+            autoPlay: autoPlayEnabled,
+            onAudioComplete: handleAudioComplete,
+        };
+
         switch (activeTab) {
             case 0:
-                return <SlideTripleConstraint />;
+                return <SlideTripleConstraint {...props} />;
             case 1:
-                return <SlideBaseline />;
+                return <SlideBaseline {...props} />;
             case 2:
-                return <SlideResourceLeveling />;
+                return <SlideResourceLeveling {...props} />;
             case 3:
-                return <SlideEVM />;
+                return <SlideEVM {...props} />;
             default:
                 return null;
         }
@@ -62,9 +76,27 @@ const Tema5_Infografic = () => {
         <div className="w-full max-w-6xl mx-auto space-y-8 pb-20">
             {/* Header */}
             <header className="text-center space-y-4 mb-12">
-                <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-purple-500 to-indigo-600 bg-clip-text text-transparent">
-                    Tema 5: Costes, Recursos y Monitorización
-                </h1>
+                <div className="flex flex-col md:flex-row justify-between items-center relative">
+                    <div className="flex-1"></div> {/* Spacer */}
+                    <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-purple-500 to-indigo-600 bg-clip-text text-transparent">
+                        Tema 5: Costes, Recursos y Monitorización
+                    </h1>
+                    {/* Auto-play Toggle */}
+                    <div className="flex-1 flex justify-end mt-4 md:mt-0 w-full md:w-auto">
+                        <button
+                            onClick={() => setAutoPlayEnabled(!autoPlayEnabled)}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all shadow-sm ${autoPlayEnabled
+                                ? 'bg-purple-600 text-white border-purple-600 ring-2 ring-purple-200'
+                                : 'bg-white dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700 hover:bg-slate-50'
+                                }`}
+                        >
+                            <span className={`w-2 h-2 rounded-full ${autoPlayEnabled ? 'bg-white animate-pulse' : 'bg-slate-300'}`}></span>
+                            <span className="text-xs font-bold uppercase tracking-wider">
+                                {autoPlayEnabled ? 'Modo Lectura: ON' : 'Modo Lectura: OFF'}
+                            </span>
+                        </button>
+                    </div>
+                </div>
                 <p className="text-lg text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
                     Este tema integra la gestión de <strong>Recursos y Costes</strong> para establecer la <strong>Línea Base del Proyecto</strong>.
                     Exploramos cómo equilibrar la <strong>Triple Restricción</strong>, definir presupuestos con reservas adecuadas, optimizar la carga de trabajo mediante <strong>Nivelación</strong> y controlar la salud financiera del proyecto mediante <strong>EVM (Earned Value Management)</strong>.

@@ -15,11 +15,12 @@ import {
 } from 'lucide-react';
 import SlideContainer from '../../shared/SlideContainer';
 
-const SlideControl = () => {
+const SlideControl = ({ autoPlay, onAudioComplete }: { autoPlay?: boolean; onAudioComplete?: () => void }) => {
 
     // --- WIDGET 1: CONTROL INTEGRADO DE CAMBIOS (CCB) ---
     const [ccbStep, setCcbStep] = useState<'request' | 'analyzing' | 'decided'>('request');
     const [ccbDecision, setCcbDecision] = useState<'approved' | 'rejected' | null>(null);
+    const [activeSection, setActiveSection] = useState<'ccb' | 'validation' | 'dikw' | null>(null);
 
     const resetCcb = () => {
         setCcbStep('request');
@@ -43,12 +44,62 @@ const SlideControl = () => {
     // --- WIDGET 3: DATOS -> INFO -> REPORTES ---
     const [dataFlowStep, setDataFlowStep] = useState(0);
 
+    const ttsSteps = [
+        {
+            id: "intro",
+            text: "Monitoreo y Control. La Torre de Control del proyecto. Aquí no solo vigilamos, sino que tomamos decisiones correctivas."
+        },
+        {
+            id: "ccb",
+            text: "Control Integrado de Cambios. Cualquier cambio debe ser analizado. Impacto en alcance, costes y tiempo antes de aprobarlo."
+        },
+        {
+            id: "validation",
+            text: "Validación. Diferencia clave: Calidad es control interno '¿Funciona bien?'. Validar Alcance es aceptación del cliente '¿Es lo que pedí?'."
+        },
+        {
+            id: "dikw",
+            text: "Refinería de Datos. Transformamos Datos brutos, en Información analizada, y finalmente en Reportes para la toma de decisiones."
+        }
+    ];
+
     return (
-        <SlideContainer title="Monitoreo y Control: La Torre de Control" className="animate-fade-in">
+        <SlideContainer
+            title="Monitoreo y Control: La Torre de Control"
+            className="animate-fade-in"
+            rate={1.2}
+            ttsSteps={ttsSteps}
+            autoPlay={autoPlay}
+            onStepChange={(id) => {
+                setActiveSection(null);
+                if (!id) {
+                    onAudioComplete?.();
+                    return;
+                }
+                if (id === 'intro') {
+                    // Reset all
+                    resetCcb();
+                    setValidationStep(0);
+                    setDataFlowStep(0);
+                }
+                if (id === 'ccb') {
+                    setActiveSection('ccb');
+                    setCcbStep('analyzing'); // Simulate moving to analysis
+                }
+                if (id === 'validation') {
+                    setActiveSection('validation');
+                    setValidationStep(1); // Show verified
+                }
+                if (id === 'dikw') {
+                    setActiveSection('dikw');
+                    setDataFlowStep(1); // Show Info level
+                }
+            }}
+        >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 
                 {/* --- SIMULADOR 1: CONTROL INTEGRADO DE CAMBIOS --- */}
-                <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md border-l-4 border-blue-600 overflow-hidden flex flex-col lg:col-span-2">
+                <div className={`bg-white dark:bg-slate-800 rounded-xl shadow-md border-l-4 border-blue-600 overflow-hidden flex flex-col lg:col-span-2 transition-all duration-500 ${activeSection === 'ccb' ? 'ring-4 ring-blue-400 scale-[1.01]' : ''}`}>
                     <div className="p-4 bg-slate-50 dark:bg-slate-800 border-b dark:border-slate-700 flex justify-between items-center">
                         <h3 className="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
                             <GitPullRequest className="w-5 h-5 text-blue-600" />
@@ -150,7 +201,7 @@ const SlideControl = () => {
                 </div>
 
                 {/* --- SIMULADOR 2: CALIDAD VS ALCANCE --- */}
-                <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md border-l-4 border-purple-600 overflow-hidden flex flex-col">
+                <div className={`bg-white dark:bg-slate-800 rounded-xl shadow-md border-l-4 border-purple-600 overflow-hidden flex flex-col transition-all duration-500 ${activeSection === 'validation' ? 'ring-4 ring-purple-400 scale-[1.01]' : ''}`}>
                     <div className="p-4 bg-slate-50 dark:bg-slate-800 border-b dark:border-slate-700">
                         <h3 className="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
                             <ShieldCheck className="w-5 h-5 text-purple-600" />
@@ -219,7 +270,7 @@ const SlideControl = () => {
                 </div>
 
                 {/* --- SIMULADOR 3: FLUJO DE DATOS --- */}
-                <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md border-l-4 border-orange-500 overflow-hidden flex flex-col">
+                <div className={`bg-white dark:bg-slate-800 rounded-xl shadow-md border-l-4 border-orange-500 overflow-hidden flex flex-col transition-all duration-500 ${activeSection === 'dikw' ? 'ring-4 ring-orange-400 scale-[1.01]' : ''}`}>
                     <div className="p-4 bg-slate-50 dark:bg-slate-800 border-b dark:border-slate-700">
                         <h3 className="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
                             <Activity className="w-5 h-5 text-orange-500" />

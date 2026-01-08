@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Play, RotateCcw, Award, AlertCircle, TrendingUp, ArrowRight } from 'lucide-react';
 
 const NODES = [
@@ -40,10 +40,38 @@ const EDGES = [
     { from: 'E', to: 'end' },
 ];
 
-export default function CriticalPathFinder() {
+interface CriticalPathFinderProps {
+    simulationStep?: number;
+}
+
+export default function CriticalPathFinder({ simulationStep }: CriticalPathFinderProps) {
     const [hoveredPath, setHoveredPath] = useState<number | null>(null);
     const [selectedPath, setSelectedPath] = useState<number | null>(null);
     const [showFeedback, setShowFeedback] = useState(false);
+
+    // Simulation Effect
+    useEffect(() => {
+        if (typeof simulationStep === 'undefined') return;
+
+        if (simulationStep === 0) {
+            handleReset();
+        }
+        if (simulationStep === 1) { // Highlight Path 1 (Superior)
+            setHoveredPath(1);
+            setSelectedPath(null);
+            setShowFeedback(false);
+        }
+        if (simulationStep === 2) { // Highlight Path 3 (Inferior - Critical) - Let's verify standard sequence
+            setHoveredPath(3);
+            setSelectedPath(null);
+            setShowFeedback(false);
+        }
+        if (simulationStep === 3) { // Select Path 3 (Correct)
+            setSelectedPath(3);
+            setShowFeedback(true);
+            setHoveredPath(null);
+        }
+    }, [simulationStep]);
 
     const calculatePathDuration = (sequence: string[]) => {
         return sequence.reduce((total, nodeId) => {

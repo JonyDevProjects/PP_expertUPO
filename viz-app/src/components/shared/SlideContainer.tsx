@@ -1,13 +1,6 @@
 import React from 'react';
 import { Card } from '../ui/Card';
 import { H2 } from '../ui/Typography';
-
-interface SlideContainerProps {
-    children: React.ReactNode;
-    title?: string;
-    className?: string;
-}
-
 import TextToSpeechButton from '../shared/TextToSpeechButton';
 
 interface TTSStep {

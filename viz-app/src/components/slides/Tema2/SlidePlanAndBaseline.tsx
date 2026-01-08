@@ -4,13 +4,13 @@ import {
     Anchor,
     List,
     Users,
-    FileText,
     AlertCircle,
     LayoutTemplate,
     ClipboardList
 } from 'lucide-react';
+import SlideContainer from '../../shared/SlideContainer';
 
-const SlidePlanAndBaseline = () => {
+const SlidePlanAndBaseline = ({ autoPlay, onAudioComplete }: { autoPlay?: boolean; onAudioComplete?: () => void }) => {
     const [activeSection, setActiveSection] = useState('definicion');
 
     const sections: any = {
@@ -19,6 +19,7 @@ const SlidePlanAndBaseline = () => {
             subtitle: "El Mapa de Gestión",
             icon: <Book className="w-6 h-6" />,
             color: "bg-indigo-600",
+            ttsText: "Definición. Documento formal que define cómo se ejecuta, monitorea, controla y cierra el proyecto. Requiere Aprobación Formal. Elementos Core: Declaración de Alcance, WBS/EDT, Métricas. Recursos y Riesgos: Personal Clave, Plan de Gestión de Riesgos, Planes Auxiliares.",
             content: (
                 <div className="space-y-4">
                     <div className="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg border-l-4 border-indigo-600">
@@ -54,6 +55,7 @@ const SlidePlanAndBaseline = () => {
             subtitle: "Índice Recomendado",
             icon: <LayoutTemplate className="w-6 h-6" />,
             color: "bg-teal-600",
+            ttsText: "Estructura del Documento. Índice Recomendado para garantizar la integridad del plan: Introducción, Objetivos, Organización, Metodología de Gestión, Programa de Trabajo, Evaluación de Riesgos, Planes Auxiliares, Temas Abiertos, Otros Aspectos. Reflexión PMP: ¿Cómo se alinean estos puntos con las Áreas de Conocimiento del PMBOK?",
             content: (
                 <div className="space-y-4">
                     <p className="text-sm text-slate-500 italic">Estructura estándar para garantizar la integridad del plan:</p>
@@ -89,6 +91,7 @@ const SlidePlanAndBaseline = () => {
             subtitle: "El Ancla de Medición",
             icon: <Anchor className="w-6 h-6" />,
             color: "bg-rose-600",
+            ttsText: "Líneas Base. Medición inicial de los indicadores que sirven como referencia para medir el avance: Alcance, Tiempo y Coste. Gestión de Cambios (La Triple Restricción): Cualquier modificación requiere control de cambios, ya que afecta inevitablemente a plazo y coste.",
             content: (
                 <div className="space-y-6">
                     <div className="text-center">
@@ -123,6 +126,7 @@ const SlidePlanAndBaseline = () => {
             subtitle: "Instrucciones para el Equipo",
             icon: <ClipboardList className="w-6 h-6" />,
             color: "bg-blue-600",
+            ttsText: "Hoja de Ruta Práctica. Instrucciones para el Equipo. 1: Organización (roles y tarifas). 2: EDT/WBS (estructura basada en entregables). 3: Cronograma (hitos intermedios). 4: Documentación (usar plantilla obligatoria).",
             content: (
                 <div className="space-y-4">
                     <div className="grid gap-3">
@@ -148,79 +152,96 @@ const SlidePlanAndBaseline = () => {
 
     const activeSectionData = sections[activeSection];
 
+    // Generate TTS steps
+    const ttsSteps = Object.entries(sections).map(([key, section]: [string, any]) => ({
+        id: key,
+        text: section.ttsText || `${section.title}. ${section.subtitle}` // Fallback if ttsText not manually added
+    }));
+
     return (
-        <div className="min-h-[calc(100vh-100px)] p-6 font-sans flex flex-col items-center">
+        <div className="animate-fade-in p-6 font-sans flex flex-col items-center">
+            <SlideContainer
+                title="Plan Maestro del Proyecto"
+                rate={1.2}
+                ttsSteps={ttsSteps}
+                autoPlay={autoPlay}
+                onStepChange={(id) => {
+                    if (!id) {
+                        onAudioComplete?.();
+                        return;
+                    }
+                    if (id && sections[id]) {
+                        setActiveSection(id);
+                    }
+                }}
+            >
+                <div className="max-w-5xl w-full">
+                    <div className="text-center mb-8">
+                        <p className="text-muted-foreground mt-2">Guía de estructura, líneas base y ejecución práctica</p>
+                    </div>
 
-            <div className="max-w-5xl w-full">
-                <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold flex justify-center items-center gap-3 text-foreground">
-                        <FileText className="w-8 h-8 text-indigo-600" />
-                        Plan Maestro del Proyecto
-                    </h1>
-                    <p className="text-muted-foreground mt-2">Guía de estructura, líneas base y ejecución práctica</p>
-                </div>
+                    {/* Navigation Tabs */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        {Object.entries(sections).map(([key, section]: [string, any]) => (
+                            <button
+                                key={key}
+                                onClick={() => setActiveSection(key)}
+                                className={`flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 border-b-4 shadow-sm ${activeSection === key
+                                    ? `bg-white dark:bg-slate-800 ${section.color.replace('bg-', 'border-')} translate-y-1 shadow-inner`
+                                    : 'bg-white dark:bg-slate-800 border-transparent hover:bg-slate-50 dark:hover:bg-slate-800 hover:-translate-y-1'
+                                    }`}
+                            >
+                                <div className={`mb-2 p-2 rounded-full ${activeSection === key ? section.color + ' text-white' : 'bg-muted text-muted-foreground'}`}>
+                                    {section.icon}
+                                </div>
+                                <span className={`font-bold text-sm ${activeSection === key ? 'text-card-foreground' : 'text-muted-foreground'}`}>
+                                    {section.title}
+                                </span>
+                            </button>
+                        ))}
+                    </div>
 
-                {/* Navigation Tabs */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    {Object.entries(sections).map(([key, section]: [string, any]) => (
-                        <button
-                            key={key}
-                            onClick={() => setActiveSection(key)}
-                            className={`flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 border-b-4 shadow-sm ${activeSection === key
-                                ? `bg-white dark:bg-slate-800 ${section.color.replace('bg-', 'border-')} translate-y-1 shadow-inner`
-                                : 'bg-white dark:bg-slate-800 border-transparent hover:bg-slate-50 dark:hover:bg-slate-800 hover:-translate-y-1'
-                                }`}
-                        >
-                            <div className={`mb-2 p-2 rounded-full ${activeSection === key ? section.color + ' text-white' : 'bg-muted text-muted-foreground'}`}>
-                                {section.icon}
+                    {/* Main Content Card */}
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden min-h-[400px] relative">
+                        {/* Header Strip */}
+                        <div className={`${activeSectionData.color} h-2 w-full`}></div>
+
+                        <div className="p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className={`p-3 rounded-lg ${activeSectionData.color} bg-opacity-10 text-slate-700`}>
+                                    {/* Clone icon with distinct color class if needed, or just use text color */}
+                                    {React.cloneElement(activeSectionData.icon, { className: `w-6 h-6 ${activeSectionData.color.replace('bg-', 'text-')}` })}
+                                </div>
+                                <div>
+                                    <h2 className="text-2xl font-bold text-card-foreground">{activeSectionData.title}</h2>
+                                    <p className="text-muted-foreground font-medium">{activeSectionData.subtitle}</p>
+                                </div>
                             </div>
-                            <span className={`font-bold text-sm ${activeSection === key ? 'text-card-foreground' : 'text-muted-foreground'}`}>
-                                {section.title}
-                            </span>
-                        </button>
-                    ))}
-                </div>
 
-                {/* Main Content Card */}
-                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden min-h-[400px] relative">
-                    {/* Header Strip */}
-                    <div className={`${activeSectionData.color} h-2 w-full`}></div>
-
-                    <div className="p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className={`p-3 rounded-lg ${activeSectionData.color} bg-opacity-10 text-slate-700`}>
-                                {/* Clone icon with distinct color class if needed, or just use text color */}
-                                {React.cloneElement(activeSectionData.icon, { className: `w-6 h-6 ${activeSectionData.color.replace('bg-', 'text-')}` })}
-                            </div>
-                            <div>
-                                <h2 className="text-2xl font-bold text-card-foreground">{activeSectionData.title}</h2>
-                                <p className="text-muted-foreground font-medium">{activeSectionData.subtitle}</p>
+                            <div className="mt-4">
+                                {activeSectionData.content}
                             </div>
                         </div>
+                    </div>
 
-                        <div className="mt-4">
-                            {activeSectionData.content}
+                    {/* Footer / Key Takeaways */}
+                    <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="bg-muted p-4 rounded-lg text-center">
+                            <h5 className="font-bold text-card-foreground text-sm mb-1">Propósito</h5>
+                            <p className="text-xs text-muted-foreground">Reducir incertidumbre y proveer un mapa claro.</p>
+                        </div>
+                        <div className="bg-muted p-4 rounded-lg text-center">
+                            <h5 className="font-bold text-card-foreground text-sm mb-1">Interesados</h5>
+                            <p className="text-xs text-muted-foreground">Su identificación temprana es vital para el éxito.</p>
+                        </div>
+                        <div className="bg-muted p-4 rounded-lg text-center">
+                            <h5 className="font-bold text-card-foreground text-sm mb-1">Planes Auxiliares</h5>
+                            <p className="text-xs text-muted-foreground">Seguridad, Comunicación y Riesgos no son opcionales.</p>
                         </div>
                     </div>
-                </div>
 
-                {/* Footer / Key Takeaways */}
-                <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-muted p-4 rounded-lg text-center">
-                        <h5 className="font-bold text-card-foreground text-sm mb-1">Propósito</h5>
-                        <p className="text-xs text-muted-foreground">Reducir incertidumbre y proveer un mapa claro.</p>
-                    </div>
-                    <div className="bg-muted p-4 rounded-lg text-center">
-                        <h5 className="font-bold text-card-foreground text-sm mb-1">Interesados</h5>
-                        <p className="text-xs text-muted-foreground">Su identificación temprana es vital para el éxito.</p>
-                    </div>
-                    <div className="bg-muted p-4 rounded-lg text-center">
-                        <h5 className="font-bold text-card-foreground text-sm mb-1">Planes Auxiliares</h5>
-                        <p className="text-xs text-muted-foreground">Seguridad, Comunicación y Riesgos no son opcionales.</p>
-                    </div>
                 </div>
-
-            </div>
+            </SlideContainer>
         </div>
     );
 };

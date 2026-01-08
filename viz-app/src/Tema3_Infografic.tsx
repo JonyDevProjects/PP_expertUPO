@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     BarChart2,
     Activity,
@@ -23,6 +23,34 @@ interface SlideItem {
 
 const Tema3_Infografic = () => {
     const [activeTab, setActiveTab] = useState(0);
+    const [autoPlayEnabled, setAutoPlayEnabled] = useState(false);
+    const [audioSequenceStep, setAudioSequenceStep] = useState(0);
+
+    // Reset sequence on tab change
+    useEffect(() => {
+        setAudioSequenceStep(0);
+    }, [activeTab]);
+
+    // Define the number of sequential slides per tab
+    const tabSteps = [1, 3, 2, 1];
+
+    const handleAudioComplete = () => {
+        const currentTabTotalSteps = tabSteps[activeTab];
+
+        if (audioSequenceStep < currentTabTotalSteps - 1) {
+            // Move to next slide within the same tab
+            setAudioSequenceStep(prev => prev + 1);
+        } else {
+            // Move to next tab
+            if (activeTab < slides.length - 1) {
+                setActiveTab(prev => prev + 1);
+                setAudioSequenceStep(0); // Explicit reset for immediate sync
+            } else {
+                // End of presentation
+                setAutoPlayEnabled(false);
+            }
+        }
+    };
 
     const slides: SlideItem[] = [
         {
@@ -48,35 +76,41 @@ const Tema3_Infografic = () => {
     ];
 
     const renderContent = () => {
+        // Helper to generate props for sequential playback
+        const getProps = (stepIndex: number) => ({
+            autoPlay: autoPlayEnabled && audioSequenceStep === stepIndex,
+            onAudioComplete: handleAudioComplete
+        });
+
         switch (activeTab) {
             case 0: // Ejecución
                 return (
                     <div className="space-y-12">
-                        <SlideExecution />
+                        <SlideExecution {...getProps(0)} />
                     </div>
                 );
             case 1: // Cronograma (6.4 Tiempo)
                 return (
                     <div className="space-y-12">
-                        <SlideEstimation />
+                        <SlideEstimation {...getProps(0)} />
                         <div className="border-t-2 border-dashed border-slate-200 dark:border-slate-700" />
-                        <SlideNetworkAnatomy />
+                        <SlideNetworkAnatomy {...getProps(1)} />
                         <div className="border-t-2 border-dashed border-slate-200 dark:border-slate-700" />
-                        <SlideCriticalPath />
+                        <SlideCriticalPath {...getProps(2)} />
                     </div>
                 );
             case 2: // Coste y Estado (6.4 Coste + 6.5 EVM)
                 return (
                     <div className="space-y-12">
-                        <SlideEVMSemaphore />
+                        <SlideEVMSemaphore {...getProps(0)} />
                         <div className="border-t-2 border-dashed border-slate-200 dark:border-slate-700" />
-                        <SlideSCurve />
+                        <SlideSCurve {...getProps(1)} />
                     </div>
                 );
             case 3: // Control y Soporte
                 return (
                     <div className="space-y-12">
-                        <SlideControl />
+                        <SlideControl {...getProps(0)} />
                     </div>
                 );
             default:
@@ -88,9 +122,27 @@ const Tema3_Infografic = () => {
         <div className="w-full max-w-6xl mx-auto space-y-8 pb-20">
             {/* Header */}
             <header className="text-center space-y-4 mb-12">
-                <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
-                    Tema 3: Ejecución, Monitorización y Control del Proyecto.
-                </h1>
+                <div className="flex flex-col md:flex-row justify-between items-center relative">
+                    <div className="flex-1"></div> {/* Spacer */}
+                    <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent flex items-center justify-center gap-3">
+                        Tema 3: Ejecución, Monitorización y Control
+                    </h1>
+                    {/* Auto-play Toggle */}
+                    <div className="flex-1 flex justify-end mt-4 md:mt-0 w-full md:w-auto">
+                        <button
+                            onClick={() => setAutoPlayEnabled(!autoPlayEnabled)}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all shadow-sm ${autoPlayEnabled
+                                ? 'bg-blue-600 text-white border-blue-600 ring-2 ring-blue-200'
+                                : 'bg-white dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700 hover:bg-slate-50'
+                                }`}
+                        >
+                            <span className={`w-2 h-2 rounded-full ${autoPlayEnabled ? 'bg-white animate-pulse' : 'bg-slate-300'}`}></span>
+                            <span className="text-xs font-bold uppercase tracking-wider">
+                                {autoPlayEnabled ? 'Modo Lectura: ON' : 'Modo Lectura: OFF'}
+                            </span>
+                        </button>
+                    </div>
+                </div>
                 <p className="text-lg text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
                     Este tema aborda la fase de <strong>realización del trabajo</strong> y la <strong>vigilancia del desempeño</strong> del proyecto. Se analiza cómo transformar <strong>la planificación en entregables tangibles</strong> mediante la <em>coordinación de recursos, equipos y stakeholders</em>. Simultáneamente, se profundiza en los procesos de <strong>Monitorización y Control</strong> para medir la salud del proyecto utilizando técnicas avanzadas como el <strong>Método de la Ruta Crítica</strong> y la <strong>Gestión del Valor Ganado (EVM)</strong>, asegurando que las variaciones en la <strong>triple restricción (Alcance, Tiempo, Coste)</strong> se gestionen mediante un <strong>Control Integrado de Cambios</strong> formal.
                 </p>

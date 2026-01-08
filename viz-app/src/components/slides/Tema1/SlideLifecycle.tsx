@@ -18,11 +18,11 @@ const steps = [
     },
     {
         id: 'gantt',
-        text: "Al final, la Gestión de Proyectos orquesta todo esto en el tiempo atraves de Procesos de Negocio: Iniciación, Planificación, Ejecución, Control y Cierre."
+        text: "Al final, la Gestión de Proyectos orquesta todo esto en el tiempo atraves de Procesos de Negocio como: Iniciación, Planificación, Ejecución, Control y Cierre."
     }
 ];
 
-const SlideLifecycle = ({ autoPlay }: { autoPlay?: boolean }) => {
+const SlideLifecycle = ({ autoPlay, onAudioComplete }: { autoPlay?: boolean; onAudioComplete?: () => void }) => {
     const [activeStep, setActiveStep] = useState<string | null>(null);
 
     // Helper class for focus mode
@@ -39,7 +39,10 @@ const SlideLifecycle = ({ autoPlay }: { autoPlay?: boolean }) => {
                 title="Desarrollo de un Proyecto"
                 rate={1.2}
                 ttsSteps={steps}
-                onStepChange={setActiveStep}
+                onStepChange={(id) => {
+                    setActiveStep(id);
+                    if (!id) onAudioComplete?.();
+                }}
                 autoPlay={autoPlay}
             >
                 <div className={getFocusClass('phases')}>

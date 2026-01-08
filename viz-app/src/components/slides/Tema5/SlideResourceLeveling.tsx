@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { BarChart2, Calendar, Users, AlertTriangle, CheckCircle, Clock, Info } from 'lucide-react';
+import { Calendar, Users, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { Card } from '../../ui/Card';
+import SlideContainer from '../../shared/SlideContainer';
 
 interface Task {
     id: string;
@@ -18,8 +19,34 @@ interface Scenario {
     status: 'danger' | 'success' | 'warning';
 }
 
-const SlideResourceLeveling = () => {
+const SlideResourceLeveling = ({ autoPlay, onAudioComplete }: { autoPlay?: boolean; onAudioComplete?: () => void }) => {
     const [mode, setMode] = useState<'original' | 'leveling' | 'smoothing'>('original');
+
+    // TTS & Simulation Logic
+    const ttsSteps = [
+        {
+            id: 'intro',
+            text: "El Histograma de Recursos nos muestra sobrecargas. Aquí, en rojo, necesitamos 3 personas pero solo tenemos 2."
+        },
+        {
+            id: 'leveling',
+            text: "La Nivelación resuelve esto retrasando tareas. La sobrecarga desaparece, pero la fecha final del proyecto se retrasa."
+        },
+        {
+            id: 'smoothing',
+            text: "El Alisado intenta ajustar usando solo la holgura. Mantiene la fecha fin, pero puede que no elimine todas las sobrecargas."
+        }
+    ];
+
+    const handleStepChange = (stepId: string | null) => {
+        if (stepId === 'intro') setMode('original');
+        if (stepId === 'leveling') setMode('leveling');
+        if (stepId === 'smoothing') setMode('smoothing');
+
+        if (stepId === null && onAudioComplete) {
+            onAudioComplete();
+        }
+    };
 
     // Configuración del escenario
     const maxCapacity = 2; // 2 Personas máximo
@@ -76,41 +103,14 @@ const SlideResourceLeveling = () => {
     const histogram = calculateHistogram();
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-500">
-            {/* Header */}
-            <div className="bg-slate-900 text-white p-6 rounded-xl shadow-lg border-l-4 border-indigo-500">
-                <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div>
-                        <h2 className="text-2xl font-bold flex items-center gap-3 text-indigo-400">
-                            <BarChart2 className="w-8 h-8" />
-                            Nivelador de Recursos
-                        </h2>
-                        <p className="text-slate-300 mt-1">Simula técnicas de optimización y su impacto en el cronograma.</p>
-                    </div>
+        <SlideContainer
+            title="3. Recursos y Nivelación"
+            rate={1.2}
+            ttsSteps={ttsSteps}
+            autoPlay={autoPlay}
+            onStepChange={handleStepChange}
+        >
 
-                    {/* Controles */}
-                    <div className="flex gap-2 bg-slate-800 p-1.5 rounded-lg border border-slate-700">
-                        <button
-                            onClick={() => setMode('original')}
-                            className={`px-3 py-1.5 rounded-md text-sm font-bold transition-all ${mode === 'original' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-white hover:bg-slate-700/50'}`}
-                        >
-                            Original
-                        </button>
-                        <button
-                            onClick={() => setMode('leveling')}
-                            className={`px-3 py-1.5 rounded-md text-sm font-bold transition-all flex items-center gap-2 ${mode === 'leveling' ? 'bg-emerald-600 text-white shadow' : 'text-slate-400 hover:text-white hover:bg-slate-700/50'}`}
-                        >
-                            <Calendar size={14} /> Nivelar
-                        </button>
-                        <button
-                            onClick={() => setMode('smoothing')}
-                            className={`px-3 py-1.5 rounded-md text-sm font-bold transition-all flex items-center gap-2 ${mode === 'smoothing' ? 'bg-orange-600 text-white shadow' : 'text-slate-400 hover:text-white hover:bg-slate-700/50'}`}
-                        >
-                            <Clock size={14} /> Alisar
-                        </button>
-                    </div>
-                </div>
-            </div>
 
             {/* Panel de Métricas */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -291,7 +291,7 @@ const SlideResourceLeveling = () => {
                 </div>
             </div>
 
-        </div>
+        </SlideContainer>
     );
 };
 

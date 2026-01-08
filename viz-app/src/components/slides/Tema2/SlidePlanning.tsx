@@ -8,8 +8,9 @@ import {
     BarChart2,
     AlertTriangle
 } from 'lucide-react';
+import SlideContainer from '../../shared/SlideContainer';
 
-const SlidePlanning = () => {
+const SlidePlanning = ({ autoPlay, onAudioComplete }: { autoPlay?: boolean; onAudioComplete?: () => void }) => {
     const [activeTab, setActiveTab] = useState('alcance');
 
     const tabs: any = {
@@ -119,90 +120,112 @@ const SlidePlanning = () => {
 
     const activeTabData = tabs[activeTab];
 
+    // Generate TTS steps
+    const ttsSteps = Object.entries(tabs).map(([key, tab]: [string, any]) => ({
+        id: key,
+        text: `${tab.title}. ${tab.content.headline}. ${tab.content.points.map((p: any) => `${p.title}: ${p.text}`).join(" ")}`
+    }));
+
     return (
-        <div className="min-h-[calc(100vh-100px)] p-4 md:p-8 font-sans">
-
-            <div className="max-w-6xl mx-auto">
-                <div className="text-center mb-10">
-                    <h1 className="text-3xl font-bold mb-2">Planificación Detallada del Proyecto</h1>
-                    <p className="text-muted-foreground max-w-2xl mx-auto">
-                        Una vez aprobado el Charter, entramos en el "Cómo". Estas son las tareas críticas para construir un Plan de Proyecto sólido.
-                    </p>
-                </div>
-
-                {/* Navigation Tabs */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                    {Object.entries(tabs).map(([key, tab]: [string, any]) => (
-                        <button
-                            key={key}
-                            onClick={() => setActiveTab(key)}
-                            className={`flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 border-b-4 shadow-sm ${activeTab === key
-                                ? `bg-white dark:bg-slate-800 ${tab.borderColor} translate-y-1 shadow-inner`
-                                : 'bg-white dark:bg-slate-800 border-transparent hover:bg-slate-50 dark:hover:bg-slate-800 hover:-translate-y-1'
-                                }`}
-                        >
-                            <div className={`mb-2 p-2 rounded-full ${activeTab === key ? tab.lightColor + ' ' + tab.textColor : 'bg-muted text-muted-foreground'} dark:bg-opacity-20`}>
-                                {tab.icon}
-                            </div>
-                            <span className={`font-bold text-sm ${activeTab === key ? 'text-card-foreground' : 'text-muted-foreground'}`}>
-                                {tab.title}
-                            </span>
-                        </button>
-                    ))}
-                </div>
-
-                {/* Main Content Card */}
-                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden min-h-[400px] relative">
-                    {/* Header Strip */}
-                    <div className={`${activeTabData.color} h-2 w-full`}></div>
-
-                    <div className="p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className={`p-3 rounded-lg ${activeTabData.lightColor} ${activeTabData.textColor} dark:bg-opacity-10 dark:text-slate-200`}>
-                                {React.cloneElement(activeTabData.icon, { className: `w-6 h-6` })}
-                            </div>
-                            <div>
-                                <h2 className="text-2xl font-bold text-card-foreground">{activeTabData.title}</h2>
-                                <p className="text-muted-foreground font-medium">{activeTabData.content.headline}</p>
-                            </div>
+        <div className="animate-fade-in p-4 md:p-8 font-sans">
+            <SlideContainer
+                title="Planificación Detallada del Proyecto"
+                rate={1.2}
+                ttsSteps={ttsSteps}
+                autoPlay={autoPlay}
+                onStepChange={(id) => {
+                    if (!id) {
+                        onAudioComplete?.();
+                        return;
+                    }
+                    if (id && tabs[id]) {
+                        setActiveTab(id);
+                    }
+                }}
+            >
+                <div className="flex flex-col items-center">
+                    <div className="max-w-6xl w-full">
+                        <div className="text-center mb-10">
+                            <p className="text-muted-foreground max-w-2xl mx-auto">
+                                Una vez aprobado el Charter, entramos en el "Cómo". Estas son las tareas críticas para construir un Plan de Proyecto sólido.
+                            </p>
                         </div>
 
-                        <div className="space-y-6">
-                            {activeTabData.content.points.map((point: any, idx: number) => (
-                                <div key={idx} className="flex gap-4 group">
-                                    <div className={`mt-1 w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors ${activeTabData.lightColor} ${activeTabData.textColor} dark:bg-slate-800 ${activeTabData.hoverBg} group-hover:text-white`}>
-                                        {idx + 1}
+                        {/* Navigation Tabs */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                            {Object.entries(tabs).map(([key, tab]: [string, any]) => (
+                                <button
+                                    key={key}
+                                    onClick={() => setActiveTab(key)}
+                                    className={`flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 border-b-4 shadow-sm ${activeTab === key
+                                        ? `bg-white dark:bg-slate-800 ${tab.borderColor} translate-y-1 shadow-inner`
+                                        : 'bg-white dark:bg-slate-800 border-transparent hover:bg-slate-50 dark:hover:bg-slate-800 hover:-translate-y-1'
+                                        }`}
+                                >
+                                    <div className={`mb-2 p-2 rounded-full ${activeTab === key ? tab.lightColor + ' ' + tab.textColor : 'bg-muted text-muted-foreground'} dark:bg-opacity-20`}>
+                                        {tab.icon}
                                     </div>
-                                    <div>
-                                        <h3 className="font-bold text-lg text-card-foreground">
-                                            {point.title}
-                                        </h3>
-                                        <p className="text-muted-foreground leading-relaxed mt-1">
-                                            {point.text}
-                                        </p>
-                                    </div>
-                                </div>
+                                    <span className={`font-bold text-sm ${activeTab === key ? 'text-card-foreground' : 'text-muted-foreground'}`}>
+                                        {tab.title}
+                                    </span>
+                                </button>
                             ))}
                         </div>
 
-                        {/* Contextual Tip based on tab */}
-                        <div className="mt-10 p-4 bg-muted border border-border rounded-lg flex gap-3 items-start">
-                            <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-                            <div className="text-sm text-muted-foreground">
-                                <strong>Nota del Experto (PMP):</strong>
-                                {activeTab === 'alcance' && " Sin una EDT (WBS) sólida, es imposible estimar Tiempo y Coste correctamente. Empieza siempre aquí."}
-                                {activeTab === 'tiempocoste' && " Recuerda que el Cronograma y el Presupuesto son Líneas Base. Solo se cambian mediante Control de Cambios."}
-                                {activeTab === 'rrhh' && " Planifica la 'Liberación' de recursos. Mantener gente sin tareas asignadas quema presupuesto innecesariamente."}
-                                {activeTab === 'riesgos' && " Identificar riesgos no es ser pesimista, es ser profesional. Un riesgo no gestionado es un problema futuro asegurado."}
-                                {activeTab === 'soporte' && " No olvides la Calidad. Es más barato prevenir errores (Planificar) que corregirlos (Inspeccionar)."}
-                                {activeTab === 'integracion' && " La Integración es tu responsabilidad exclusiva como PM. No se puede delegar."}
+                        {/* Main Content Card */}
+                        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden min-h-[400px] relative">
+                            {/* Header Strip */}
+                            <div className={`${activeTabData.color} h-2 w-full`}></div>
+
+                            <div className="p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className={`p-3 rounded-lg ${activeTabData.lightColor} ${activeTabData.textColor} dark:bg-opacity-10 dark:text-slate-200`}>
+                                        {React.cloneElement(activeTabData.icon, { className: `w-6 h-6` })}
+                                    </div>
+                                    <div>
+                                        <h2 className="text-2xl font-bold text-card-foreground">{activeTabData.title}</h2>
+                                        <p className="text-muted-foreground font-medium">{activeTabData.content.headline}</p>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-6">
+                                    {activeTabData.content.points.map((point: any, idx: number) => (
+                                        <div key={idx} className="flex gap-4 group">
+                                            <div className={`mt-1 w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors ${activeTabData.lightColor} ${activeTabData.textColor} dark:bg-slate-800 ${activeTabData.hoverBg} group-hover:text-white`}>
+                                                {idx + 1}
+                                            </div>
+                                            <div>
+                                                <h3 className="font-bold text-lg text-card-foreground">
+                                                    {point.title}
+                                                </h3>
+                                                <p className="text-muted-foreground leading-relaxed mt-1">
+                                                    {point.text}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Contextual Tip based on tab */}
+                                <div className="mt-10 p-4 bg-muted border border-border rounded-lg flex gap-3 items-start">
+                                    <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                                    <div className="text-sm text-muted-foreground">
+                                        <strong>Nota del Experto (PMP):</strong>
+                                        {activeTab === 'alcance' && " Sin una EDT (WBS) sólida, es imposible estimar Tiempo y Coste correctamente. Empieza siempre aquí."}
+                                        {activeTab === 'tiempocoste' && " Recuerda que el Cronograma y el Presupuesto son Líneas Base. Solo se cambian mediante Control de Cambios."}
+                                        {activeTab === 'rrhh' && " Planifica la 'Liberación' de recursos. Mantener gente sin tareas asignadas quema presupuesto innecesariamente."}
+                                        {activeTab === 'riesgos' && " Identificar riesgos no es ser pesimista, es ser profesional. Un riesgo no gestionado es un problema futuro asegurado."}
+                                        {activeTab === 'soporte' && " No olvides la Calidad. Es más barato prevenir errores (Planificar) que corregirlos (Inspeccionar)."}
+                                        {activeTab === 'integracion' && " La Integración es tu responsabilidad exclusiva como PM. No se puede delegar."}
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
-
                     </div>
                 </div>
-            </div>
+            </SlideContainer>
         </div>
     );
 };

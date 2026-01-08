@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FastForward, DollarSign, AlertOctagon, Gauge, Info, ArrowDown, Users, ArrowRight } from 'lucide-react';
 
 const Card = ({ children, className = "" }: any) => (
@@ -7,8 +7,18 @@ const Card = ({ children, className = "" }: any) => (
     </div>
 );
 
-export default function CrashingVsFastTracking() {
+interface CrashingVsFastTrackingProps {
+    activeScenario?: 'none' | 'crashing' | 'fast-tracking' | null;
+}
+
+export default function CrashingVsFastTracking({ activeScenario }: CrashingVsFastTrackingProps) {
     const [method, setMethod] = useState<'none' | 'crashing' | 'fast-tracking'>('none');
+
+    useEffect(() => {
+        if (activeScenario) {
+            setMethod(activeScenario);
+        }
+    }, [activeScenario]);
 
     const getMetrics = () => {
         switch (method) {

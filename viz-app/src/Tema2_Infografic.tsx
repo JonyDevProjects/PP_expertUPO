@@ -17,6 +17,7 @@ interface SlideItem {
 
 const Tema2_Infografic = () => {
     const [activeTab, setActiveTab] = useState(0);
+    const [autoPlayEnabled, setAutoPlayEnabled] = useState(false);
 
     const slides: SlideItem[] = [
         {
@@ -36,24 +37,37 @@ const Tema2_Infografic = () => {
         },
     ];
 
+    const handleAudioComplete = () => {
+        if (activeTab < slides.length - 1) {
+            setActiveTab(prev => prev + 1);
+        } else {
+            setAutoPlayEnabled(false);
+        }
+    };
+
     const renderContent = () => {
+        const props = {
+            autoPlay: autoPlayEnabled,
+            onAudioComplete: handleAudioComplete
+        };
+
         switch (activeTab) {
             case 0:
                 return (
                     <div className="space-y-12">
-                        <SlidePrePlanning />
+                        <SlidePrePlanning {...props} />
                     </div>
                 );
             case 1:
                 return (
                     <div className="space-y-12">
-                        <SlidePlanning />
+                        <SlidePlanning {...props} />
                     </div>
                 );
             case 2:
                 return (
                     <div className="space-y-12">
-                        <SlidePlanAndBaseline />
+                        <SlidePlanAndBaseline {...props} />
                     </div>
                 );
             default:
@@ -65,9 +79,28 @@ const Tema2_Infografic = () => {
         <div className="w-full max-w-6xl mx-auto space-y-8 pb-20">
             {/* Header */}
             <header className="text-center space-y-4 mb-12">
-                <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent flex justify-center items-center gap-4">
-                    Tema 2: Planificación de Proyectos
-                </h1>
+                <div className="flex flex-col md:flex-row justify-between items-center relative">
+                    <div className="flex-1"></div> {/* Spacer */}
+                    <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent flex justify-center items-center gap-4">
+                        Tema 2: Planificación de Proyectos
+                    </h1>
+                    {/* Auto-play Toggle */}
+                    <div className="flex-1 flex justify-end mt-4 md:mt-0 w-full md:w-auto">
+                        <button
+                            onClick={() => setAutoPlayEnabled(!autoPlayEnabled)}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all shadow-sm ${autoPlayEnabled
+                                ? 'bg-teal-600 text-white border-teal-600 ring-2 ring-teal-200'
+                                : 'bg-white dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700 hover:bg-slate-50'
+                                }`}
+                        >
+                            <span className={`w-2 h-2 rounded-full ${autoPlayEnabled ? 'bg-white animate-pulse' : 'bg-slate-300'}`}></span>
+                            <span className="text-xs font-bold uppercase tracking-wider">
+                                {autoPlayEnabled ? 'Modo Lectura: ON' : 'Modo Lectura: OFF'}
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
                 <p className="text-lg text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
                     Este tema abarca el ciclo integral de la planificación, comenzando desde la <strong>Génesis y el Acta de Constitución (Charter)</strong> que autorizan el proyecto, hasta la elaboración del <strong>Plan de Proyecto</strong> detallado. Se profundiza en la creación de planes subsidiarios críticos, con énfasis en la <strong>Estructura de Desglose del Trabajo (EDT/WBS)</strong> para el alcance, y la definición de <strong>Líneas Base (Alcance, Tiempo y Coste)</strong> como referencias inmutables para medir el desempeño y gestionar cambios durante la ejecución.
                 </p>

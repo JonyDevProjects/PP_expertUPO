@@ -37,7 +37,11 @@ const Button = ({ children, onClick, variant = 'primary', disabled = false, clas
     );
 };
 
-export default function DependencyLogicLab() {
+interface DependencyLogicLabProps {
+    simulationStep?: number;
+}
+
+export default function DependencyLogicLab({ simulationStep }: DependencyLogicLabProps) {
     const [dependencies, setDependencies] = useState<any[]>([]);
     const [selectedSource, setSelectedSource] = useState<string | null>(null);
     const [selectedTarget, setSelectedTarget] = useState<string | null>(null);
@@ -45,6 +49,40 @@ export default function DependencyLogicLab() {
     const [lag, setLag] = useState(0);
     const [error, setError] = useState<string | null>(null);
     const [schedule, setSchedule] = useState<any>({});
+
+    // Simulation Effect
+    useEffect(() => {
+        if (typeof simulationStep === 'undefined') return;
+
+        if (simulationStep === 0) {
+            setDependencies([]);
+            setLag(0);
+        }
+        if (simulationStep === 1) { // FS: Muros -> Ventanas
+            setDependencies([{ id: 1, source: 't1', target: 't2', type: 'FS', lag: 0 }]);
+        }
+        if (simulationStep === 2) { // FS: Ventanas -> Pintar
+            setDependencies([
+                { id: 1, source: 't1', target: 't2', type: 'FS', lag: 0 },
+                { id: 2, source: 't2', target: 't3', type: 'FS', lag: 0 }
+            ]);
+        }
+        if (simulationStep === 3) { // Lag: Esperar 2 días
+            setDependencies([
+                { id: 1, source: 't1', target: 't2', type: 'FS', lag: 2 },
+                { id: 2, source: 't2', target: 't3', type: 'FS', lag: 0 }
+            ]);
+            setLag(2);
+        }
+        if (simulationStep === 4) { // Lead: Adelanto (Fast Tracking)
+            setDependencies([
+                { id: 1, source: 't1', target: 't2', type: 'FS', lag: -1 },
+                { id: 2, source: 't2', target: 't3', type: 'FS', lag: 0 }
+            ]);
+            setLag(-1);
+        }
+
+    }, [simulationStep]);
 
     useEffect(() => {
         calculateSchedule();

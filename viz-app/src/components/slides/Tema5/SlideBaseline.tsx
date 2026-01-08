@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { DollarSign, ShieldAlert, ShieldCheck, PieChart, RefreshCw, AlertCircle, ArrowRight } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, PieChart, AlertCircle, ArrowRight } from 'lucide-react';
 import { Card } from '../../ui/Card';
+import SlideContainer from '../../shared/SlideContainer';
 
 interface BudgetItem {
     id: string;
@@ -11,7 +12,7 @@ interface BudgetItem {
     location: 'inventory' | 'baseline' | 'management';
 }
 
-const SlideBaseline = () => {
+const SlideBaseline = ({ autoPlay, onAudioComplete }: { autoPlay?: boolean; onAudioComplete?: () => void }) => {
     // Estado inicial de los bloques
     const initialItems: BudgetItem[] = [
         { id: 'act1', type: 'activity', label: 'Estimación Actividad A', cost: 5000, color: 'bg-blue-600', location: 'inventory' },
@@ -23,6 +24,51 @@ const SlideBaseline = () => {
     const [items, setItems] = useState<BudgetItem[]>(initialItems);
     const [feedback, setFeedback] = useState({ msg: 'Arrastra los bloques a su zona correspondiente.', type: 'info' });
     const [draggedItem, setDraggedItem] = useState<BudgetItem | null>(null);
+
+    // TTS & Simulation Logic
+    const ttsSteps = [
+        {
+            id: 'intro',
+            text: "El presupuesto se construye por capas. Primero, las Estimaciones de Costes de las Actividades."
+        },
+        {
+            id: 'move_activity',
+            text: "Sumamos los costes directos de los paquetes de trabajo. Esto va a la Línea Base.",
+        },
+        {
+            id: 'move_contingency',
+            text: "Luego, añadimos las Reservas de Contingencia para riesgos conocidos ('Conocidos-Desconocidos'). Sigue siendo Línea Base.",
+        },
+        {
+            id: 'move_management',
+            text: "Finalmente, la Reserva de Gestión para imprevistos totales ('Desconocidos-Desconocidos'). Esto NO es Línea Base, pero es parte del Presupuesto.",
+        }
+    ];
+
+    const handleStepChange = (stepId: string | null) => {
+        if (stepId === 'intro') {
+            reset();
+        }
+        if (stepId === 'move_activity') {
+            // Move Activity A to Baseline
+            setItems(prev => prev.map(i => i.id === 'act1' ? { ...i, location: 'baseline' } : i));
+            setFeedback({ msg: 'Costes Directos añadidos a la Línea Base.', type: 'success' });
+        }
+        if (stepId === 'move_contingency') {
+            // Move Contingency to Baseline
+            setItems(prev => prev.map(i => i.id === 'cont1' ? { ...i, location: 'baseline' } : i));
+            setFeedback({ msg: 'Reserva de Contingencia añadida. El PM tiene control sobre esto.', type: 'success' });
+        }
+        if (stepId === 'move_management') {
+            // Move Management to Management Zone
+            setItems(prev => prev.map(i => i.id === 'mgmt1' ? { ...i, location: 'management' } : i));
+            setFeedback({ msg: 'Reserva de Gestión añadida. Requiere aprobación externa para usarse.', type: 'warning' });
+        }
+
+        if (stepId === null && onAudioComplete) {
+            onAudioComplete();
+        }
+    };
 
     // Totales
     const baselineTotal = items.filter(i => i.location === 'baseline').reduce((acc, i) => acc + i.cost, 0);
@@ -121,22 +167,13 @@ const SlideBaseline = () => {
     };
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-500">
-            {/* Header */}
-            <div className="bg-slate-900 text-white p-6 rounded-xl shadow-lg border-l-4 border-emerald-500">
-                <div className="flex justify-between items-center">
-                    <div>
-                        <h2 className="text-2xl font-bold flex items-center gap-3 text-emerald-400">
-                            <DollarSign className="w-8 h-8" />
-                            Constructor del Presupuesto
-                        </h2>
-                        <p className="text-slate-300 mt-1">Arrastra los costes a la capa jerárquica correcta.</p>
-                    </div>
-                    <button onClick={reset} className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700" title="Reiniciar">
-                        <RefreshCw size={20} />
-                    </button>
-                </div>
-            </div>
+        <SlideContainer
+            title="2. Presupuesto (Líneas Base)"
+            rate={1.2}
+            ttsSteps={ttsSteps}
+            autoPlay={autoPlay}
+            onStepChange={handleStepChange}
+        >
 
             {/* Área de Feedback */}
             <div className={`p-4 rounded-lg border-l-4 flex items-start gap-3 transition-all duration-300 ${getFeedbackStyle()}`}>
@@ -292,7 +329,7 @@ const SlideBaseline = () => {
                 </div>
             </div>
 
-        </div>
+        </SlideContainer>
     );
 };
 
